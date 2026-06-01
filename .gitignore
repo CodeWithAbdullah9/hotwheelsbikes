@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Environment files — NEVER commit these
+.env
+.env.local
+.env.production
+backend/.env
+
+# Build outputs
+dist/
+build/
+*/dist/
+*/build/
+
+# Vite cache
+.vite/
+*/.vite/
+*.timestamp-*.mjs
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Uploads (user uploaded files)
+backend/uploads/
+
+# IDE
+.vscode/
+.idea/
