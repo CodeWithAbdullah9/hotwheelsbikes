@@ -8,14 +8,10 @@ const passport = require('./middleware/passport');
 const app = express();
 
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'http://localhost:5174',
-    'http://localhost:5190',
-    'https://hotwheelsbikes.vercel.app',
-    'https://hotwheelsbikes-kwca.vercel.app',
-    process.env.FRONTEND_URL,
-  ].filter(Boolean),
+  origin: function (origin, callback) {
+    // Allow all origins in production (Vercel URLs change)
+    callback(null, true);
+  },
   credentials: true
 }));
 app.use(express.json());
