@@ -1,14 +1,21 @@
 require('dotenv').config();
-const express  = require('express');
-const cors     = require('cors');
+const express = require('express');
+const cors = require('cors');
 const mongoose = require('mongoose');
-const session  = require('express-session');
+const session = require('express-session');
 const passport = require('./middleware/passport');
 
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5190'],
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:5190',
+    'https://hotwheelsbikes.vercel.app',
+    'https://hotwheelsbikes-kwca.vercel.app',
+    process.env.FRONTEND_URL,
+  ].filter(Boolean),
   credentials: true
 }));
 app.use(express.json());
@@ -17,15 +24,15 @@ app.use(passport.initialize());
 app.use('/uploads', express.static('uploads'));
 
 // Routes
-app.use('/api/auth',      require('./routes/auth'));
-app.use('/api/user',      require('./routes/userAuth'));
-app.use('/api/products',  require('./routes/products'));
-app.use('/api/orders',    require('./routes/orders'));
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/user', require('./routes/userAuth'));
+app.use('/api/products', require('./routes/products'));
+app.use('/api/orders', require('./routes/orders'));
 app.use('/api/customers', require('./routes/customers'));
-app.use('/api/reports',   require('./routes/reports'));
-app.use('/api/settings',  require('./routes/settings'));
-app.use('/api/logs',      require('./routes/logs'));
-app.use('/api/payment',   require('./routes/payment'));
+app.use('/api/reports', require('./routes/reports'));
+app.use('/api/settings', require('./routes/settings'));
+app.use('/api/logs', require('./routes/logs'));
+app.use('/api/payment', require('./routes/payment'));
 
 // Health check
 app.get('/api/health', (_, res) => res.json({ status: 'ok', time: new Date() }));
@@ -33,8 +40,9 @@ app.get('/api/health', (_, res) => res.json({ status: 'ok', time: new Date() }))
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB connected');
-    app.listen(process.env.PORT, () =>
-      console.log(`🚀 Server running on http://localhost:${process.env.PORT}`)
+    const PORT = process.env.PORT || 5001;
+    app.listen(PORT, '0.0.0.0', () =>
+      console.log(`🚀 Server running on port ${PORT}`)
     );
   })
   .catch(err => { console.error('❌ MongoDB error:', err.message); process.exit(1); });
