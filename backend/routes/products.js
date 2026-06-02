@@ -1,10 +1,10 @@
-const router   = require('express').Router();
-const Product  = require('../models/Product');
+const router = require('express').Router();
+const Product = require('../models/Product');
 const StockLog = require('../models/StockLog');
 const { protect, authorize } = require('../middleware/auth');
-const multer   = require('multer');
-const path     = require('path');
-const fs       = require('fs');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 // Multer setup
 const storage = multer.diskStorage({
@@ -17,27 +17,29 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
-// GET all products (public for frontend)
+// GET all products (public for frontend) - only active products
 router.get('/public', async (req, res) => {
   try {
-    const products = await Product.find().select('name category price salePrice stock image sku description');
+    const products = await Product.find({ isActive: true })
+      .select('name category price salePrice stock image sku description _id')
+      .sort({ createdAt: -1 });
     res.json({
       success: true,
       products: products
     });
   } catch (error) {
-    res.status(500).json({ 
-      success: false, 
-      message: error.message 
+    res.status(500).json({
+      success: false,
+      message: error.message
     });
   }
 });
 
-// GET all products (protected for admin)
+// GET all products (protected for admin) - only active products
 router.get('/', protect, async (req, res) => {
   try {
     const { search, series, minPrice, maxPrice, stockStatus, page = 1, limit = 100 } = req.query;
-    const query = {};
+    const query = { isActive: true };  // Always filter out deleted products
 
     if (search) query.$or = [
       { name: { $regex: search, $options: 'i' } },
@@ -51,11 +53,11 @@ router.get('/', protect, async (req, res) => {
       if (minPrice) query.price.$gte = +minPrice;
       if (maxPrice) query.price.$lte = +maxPrice;
     }
-    if (stockStatus === 'low')     query.$expr = { $lte: ['$stock', '$lowStockAlert'] };
-    if (stockStatus === 'out')     query.stock = 0;
-    if (stockStatus === 'in')      query.stock = { $gt: 0 };
+    if (stockStatus === 'low') query.$expr = { $lte: ['$stock', '$lowStockAlert'] };
+    if (stockStatus === 'out') query.stock = 0;
+    if (stockStatus === 'in') query.stock = { $gt: 0 };
 
-    const total    = await Product.countDocuments(query);
+    const total = await Product.countDocuments(query);
     const products = await Product.find(query)
       .sort({ createdAt: -1 })
       .skip((+page - 1) * +limit)
@@ -75,7 +77,7 @@ router.get('/:id', protect, async (req, res) => {
 });
 
 // POST create product
-router.post('/', protect, authorize('super_admin','inventory_manager'), upload.single('image'), async (req, res) => {
+router.post('/', protect, authorize('super_admin', 'inventory_manager'), upload.single('image'), async (req, res) => {
   try {
     const data = { ...req.body };
     if (req.file) data.image = `/uploads/products/${req.file.filename}`;
@@ -93,7 +95,7 @@ router.post('/', protect, authorize('super_admin','inventory_manager'), upload.s
 });
 
 // PUT update product
-router.put('/:id', protect, authorize('super_admin','inventory_manager'), upload.single('image'), async (req, res) => {
+router.put('/:id', protect, authorize('super_admin', 'inventory_manager'), upload.single('image'), async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Not found' });
@@ -149,7 +151,7 @@ router.get('/alerts/low-stock', protect, async (req, res) => {
 });
 
 // POST bulk import CSV
-router.post('/bulk/import', protect, authorize('super_admin','inventory_manager'), async (req, res) => {
+router.post('/bulk/import', protect, authorize('super_admin', 'inventory_manager'), async (req, res) => {
   try {
     const { products } = req.body;
     const results = await Product.insertMany(products, { ordered: false });
