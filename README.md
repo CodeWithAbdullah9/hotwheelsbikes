@@ -35,36 +35,6 @@ npm install
 npm run dev
 ```
 
-## Environment Variables (backend/.env)
-
-```env
-PORT=5001
-MONGO_URI=mongodb://localhost:27017/hotwheels_admin
-JWT_SECRET=your_jwt_secret
-USER_JWT_SECRET=your_user_jwt_secret
-
-# Email Notifications
-EMAIL_USER=your_gmail@gmail.com
-EMAIL_PASS=your_gmail_app_password
-ADMIN_EMAIL=admin@yourdomain.com
-
-# WhatsApp Notifications (CallMeBot)
-WHATSAPP_PHONE=923xxxxxxxxx
-WHATSAPP_APIKEY=your_callmebot_apikey
-```
-
-## Seed Database
-
-```bash
-cd backend
-node seedWebProducts.js   # Seeds 22 web products
-node seed.js              # Seeds admin user + sample data
-```
-
-## Admin Login
-- URL: http://localhost:5190
-- Email: admin@hotwheels.com
-- Password: admin123
 
 ## Features
 - Full e-commerce storefront with cart & checkout
