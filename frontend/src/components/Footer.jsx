@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import { Phone, Mail, MapPin, ArrowRight, Bike } from "lucide-react";
 import Logo from "./Logo";
 import { useContext } from "react";
@@ -42,10 +43,27 @@ const shopLinks = [
 
 export default function Footer() {
   const { triggerLoader } = useContext(LoaderContext) || {};
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterMsg, setNewsletterMsg] = useState(null);
 
   const handleLogoClick = () => {
     if (triggerLoader) triggerLoader();
     window.scrollTo({ top: 0, behavior: "instant" });
+  };
+
+  const handleNewsletter = async (e) => {
+    e.preventDefault();
+    if (!newsletterEmail.trim()) return;
+    try {
+      await fetch("/api/orders/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Newsletter Subscriber", phone: "newsletter", message: `Newsletter subscription request from: ${newsletterEmail}` }),
+      });
+    } catch (_) { /* ignore */ }
+    setNewsletterMsg("Subscribed! We'll keep you updated.");
+    setNewsletterEmail("");
+    setTimeout(() => setNewsletterMsg(null), 4000);
   };
   return (
     <footer style={{ background: "#0b1a0e", borderTop: "1px solid rgba(74,222,128,0.18)" }}>
@@ -58,8 +76,8 @@ export default function Footer() {
         background: "linear-gradient(135deg,#0f2214 0%,#132a18 100%)",
         borderBottom: "1px solid rgba(74,222,128,0.12)",
       }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "36px 40px" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 32, flexWrap: "wrap" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "clamp(20px, 4vw, 36px) clamp(16px, 4vw, 40px)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24, flexWrap: "wrap" }}>
             <div style={{ flex: "1 1 300px" }}>
               <h3 style={{
                 color: "#f0fdf4", fontSize: 22, fontWeight: 700,
@@ -70,9 +88,11 @@ export default function Footer() {
               </h3>
               <p style={{ color: "#86efac", fontSize: 14 }}>Get the latest deals, new arrivals and cycling tips.</p>
             </div>
-            <form style={{ display: "flex", gap: 10, flexWrap: "wrap", flex: "1 1 300px" }} className="footer-newsletter-form" onSubmit={e => e.preventDefault()}>
+            <form style={{ display: "flex", gap: 10, flexWrap: "wrap", flex: "1 1 300px" }} className="footer-newsletter-form" onSubmit={handleNewsletter}>
               <input
                 type="email"
+                value={newsletterEmail}
+                onChange={e => setNewsletterEmail(e.target.value)}
                 placeholder="Enter your email address"
                 style={{
                   padding: "12px 18px",
@@ -96,13 +116,18 @@ export default function Footer() {
               >
                 Subscribe <ArrowRight size={14} />
               </button>
+              {newsletterMsg && (
+                <p style={{ width: "100%", color: "#4ade80", fontSize: 13, fontWeight: 600, marginTop: 4 }}>
+                  ✓ {newsletterMsg}
+                </p>
+              )}
             </form>
           </div>
         </div>
       </div>
 
       {/* ── Main grid ── */}
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "56px 40px 44px" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "clamp(32px, 5vw, 56px) clamp(16px, 4vw, 40px) clamp(24px, 4vw, 44px)" }}>
         <div className="footer-grid" style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
@@ -121,8 +146,8 @@ export default function Footer() {
             <div style={{ display: "flex", gap: 10 }}>
               {[
                 { href: "https://www.facebook.com/HotWheelsBikeShopDHA", icon: <FB />, label: "Facebook" },
-                { href: "#", icon: <YT />, label: "YouTube" },
-                { href: "#", icon: <IG />, label: "Instagram" },
+                { href: "https://www.youtube.com/@hotwheelsbikes", icon: <YT />, label: "YouTube" },
+                { href: "https://www.instagram.com/hotwheelsbikesdha", icon: <IG />, label: "Instagram" },
               ].map(s => (
                 <a
                   key={s.label}
@@ -280,7 +305,7 @@ export default function Footer() {
 
       {/* ── Bottom bar ── */}
       <div style={{ borderTop: "1px solid rgba(74,222,128,0.12)", background: "#071a09" }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "16px 40px" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "16px clamp(16px, 4vw, 40px)" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }} className="footer-bottom">
             <p style={{ color: "#6b9e7a", fontSize: 13 }}>
               © 2025 Hot Wheels Bikes Shop. All rights reserved.

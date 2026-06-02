@@ -77,7 +77,7 @@ export default function Orders() {
       </div>
 
       {/* Statistics Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 15, marginBottom: 25 }}>
+      <div className="stats-grid">
         <div className="card" style={{ textAlign: 'center', padding: '20px 15px' }}>
           <div style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--green)', marginBottom: '6px' }}>
             {stats.total || 0}
@@ -263,7 +263,7 @@ export default function Orders() {
               <button onClick={() => setSelected(null)} className="btn btn-danger btn-sm"><X size={15} /></button>
             </div>
             <div className="modal-body">
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20, marginBottom: 20 }}>
                 <div>
                   <p style={{ color: 'var(--muted)', fontSize: 11, textTransform: 'uppercase', marginBottom: 6 }}>Customer</p>
                   <p style={{ color: 'var(--text)', fontWeight: 600 }}>{selected.customer.name}</p>

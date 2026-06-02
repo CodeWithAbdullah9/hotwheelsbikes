@@ -86,18 +86,19 @@ export default function Settings() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 24, borderBottom: '1px solid var(--border)' }}>
+      <div style={{ display: 'flex', gap: 4, marginBottom: 24, borderBottom: '1px solid var(--border)', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
         {TABS.map(({ id, label, icon: Icon }) => (
           <button key={id} onClick={() => setTab(id)}
             style={{
-              display: 'flex', alignItems: 'center', gap: 7, padding: '10px 18px',
+              display: 'flex', alignItems: 'center', gap: 7, padding: '10px 14px',
               background: 'transparent', border: 'none', cursor: 'pointer',
               color: tab === id ? 'var(--green)' : 'var(--muted)',
-              fontWeight: 700, fontSize: 13,
+              fontWeight: 700, fontSize: 12,
               borderBottom: tab === id ? '2px solid var(--green)' : '2px solid transparent',
               marginBottom: -1, transition: 'all 0.15s',
+              flexShrink: 0, whiteSpace: 'nowrap',
             }}>
-            <Icon size={15} />{label}
+            <Icon size={14} />{label}
           </button>
         ))}
       </div>
@@ -105,8 +106,7 @@ export default function Settings() {
       {/* Store Settings */}
       {tab === 'store' && settings && (
         <form onSubmit={saveSettings}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-            {/* Store Info */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20 }}>
             <div className="card">
               <h3 style={{ color: 'var(--text)', fontSize: 15, fontWeight: 700, marginBottom: 18 }}>Store Information</h3>
               <div className="form-group">
@@ -176,7 +176,7 @@ export default function Settings() {
       {/* Payment Methods */}
       {tab === 'payment' && settings && (
         <form onSubmit={saveSettings}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20 }}>
 
             {/* COD */}
             <div className="card">
@@ -264,7 +264,7 @@ export default function Settings() {
                   <span style={{ color: 'var(--muted)', fontSize: 12 }}>Enabled</span>
                 </label>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>
                 <div className="form-group">
                   <label className="form-label">Stripe Public Key</label>
                   <input value={settings.stripePublicKey || ''} onChange={e => set('stripePublicKey', e.target.value)} className="form-input" placeholder="pk_test_..." />

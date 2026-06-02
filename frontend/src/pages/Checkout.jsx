@@ -13,7 +13,7 @@ import { useWindowWidth } from "../hooks/useWindowWidth";
 const API = "/api";
 
 const S = {
-  page: { minHeight: "100vh", background: "#0b1a0e", padding: "40px 24px" },
+  page: { minHeight: "100vh", background: "#0b1a0e", padding: "clamp(20px, 4vw, 40px) clamp(12px, 4vw, 24px)" },
   wrap: { maxWidth: 1100, margin: "0 auto" },
   card: { background: "#0f2214", border: "1px solid rgba(74,222,128,0.12)", borderRadius: 20, padding: "24px 28px" },
   label: { display: "block", fontSize: 11, fontWeight: 700, color: "#86efac", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em" },
@@ -209,7 +209,7 @@ export default function Checkout() {
               {/* Delivery Address */}
               <div style={S.card}>
                 <p style={S.title}><span style={S.icon}><MapPin size={14} style={{ color: "#4ade80" }} /></span> Delivery Address</p>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14 }}>
                   <div style={{ gridColumn: "1/-1" }}>
                     <label style={S.label}>Street Address *</label>
                     <input value={form.address} onChange={e => inp("address", e.target.value)} required placeholder="House #, Street, Area"

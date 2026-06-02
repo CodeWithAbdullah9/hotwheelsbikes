@@ -82,18 +82,19 @@ export default function Reports() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 24, borderBottom: '1px solid var(--border)', paddingBottom: 0 }}>
+      <div style={{ display: 'flex', gap: 4, marginBottom: 24, borderBottom: '1px solid var(--border)', paddingBottom: 0, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
         {TABS.map(({ id, label, icon: Icon }) => (
           <button key={id} onClick={() => setTab(id)}
             style={{
-              display: 'flex', alignItems: 'center', gap: 7, padding: '10px 18px',
+              display: 'flex', alignItems: 'center', gap: 7, padding: '10px 14px',
               background: 'transparent', border: 'none', cursor: 'pointer',
               color: tab === id ? 'var(--green)' : 'var(--muted)',
-              fontWeight: 700, fontSize: 13,
+              fontWeight: 700, fontSize: 12,
               borderBottom: tab === id ? '2px solid var(--green)' : '2px solid transparent',
               marginBottom: -1, transition: 'all 0.15s',
+              flexShrink: 0, whiteSpace: 'nowrap',
             }}>
-            <Icon size={15} />{label}
+            <Icon size={14} />{label}
           </button>
         ))}
       </div>
@@ -201,7 +202,7 @@ export default function Reports() {
               {tab === 'pos' && (
                 <>
                   {/* POS vs Online Comparison */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20, marginBottom: 24 }}>
                     <div className="card">
                       <h3 style={{ color: 'var(--text)', fontSize: 15, fontWeight: 700, marginBottom: 6 }}>Online Sales</h3>
                       <p style={{ color: '#60a5fa', fontSize: 28, fontWeight: 900, fontFamily: "'Rajdhani',sans-serif" }}>{fmt(totalOnline)}</p>

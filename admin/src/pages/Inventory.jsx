@@ -321,7 +321,7 @@ export default function Inventory() {
                     <Package size={16} style={{ color: 'var(--green)' }} />
                     <h4 style={{ fontFamily: "'Rajdhani',sans-serif", fontSize: 15, fontWeight: 600, color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Basic Information</h4>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
                     <div className="form-group" style={{ gridColumn: '1/-1' }}>
                       <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                         <Tag size={13} style={{ color: 'var(--green)' }} /> Product Name <span style={{ color: 'var(--red)' }}>*</span>
@@ -371,7 +371,7 @@ export default function Inventory() {
                     <DollarSign size={16} style={{ color: 'var(--green)' }} />
                     <h4 style={{ fontFamily: "'Rajdhani',sans-serif", fontSize: 15, fontWeight: 600, color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pricing</h4>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 16 }}>
                     <div className="form-group">
                       <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                         <Banknote size={13} style={{ color: 'var(--green)' }} /> Price (PKR) <span style={{ color: 'var(--red)' }}>*</span>
@@ -399,7 +399,7 @@ export default function Inventory() {
                     <Package size={16} style={{ color: 'var(--green)' }} />
                     <h4 style={{ fontFamily: "'Rajdhani',sans-serif", fontSize: 15, fontWeight: 600, color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Inventory</h4>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
                     <div className="form-group">
                       <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                         <span style={{ fontSize: 13 }}>🔢</span> Stock Quantity <span style={{ color: 'var(--red)' }}>*</span>

@@ -6,16 +6,16 @@ const fmt = n => `₨ ${(n || 0).toLocaleString()}`
 
 export default function Customers() {
   const [customers, setCustomers] = useState([])
-  const [total, setTotal]         = useState(0)
-  const [page, setPage]           = useState(1)
-  const [pages, setPages]         = useState(1)
-  const [loading, setLoading]     = useState(true)
-  const [search, setSearch]       = useState('')
-  const [modal, setModal]         = useState(null) // null | 'add' | 'edit' | 'view'
-  const [selected, setSelected]   = useState(null)
-  const [orders, setOrders]       = useState([])
-  const [saving, setSaving]       = useState(false)
-  const [form, setForm]           = useState({})
+  const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(1)
+  const [pages, setPages] = useState(1)
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [modal, setModal] = useState(null) // null | 'add' | 'edit' | 'view'
+  const [selected, setSelected] = useState(null)
+  const [orders, setOrders] = useState([])
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState({})
 
   const load = async (p = 1) => {
     setLoading(true)
@@ -46,7 +46,7 @@ export default function Customers() {
       const { data } = await api.get(`/customers/${c._id}`)
       setSelected(data.customer)
       setOrders(data.orders)
-    } catch {}
+    } catch { }
   }
 
   const handleSave = async (e) => {
@@ -159,7 +159,7 @@ export default function Customers() {
             </div>
             <form onSubmit={handleSave}>
               <div className="modal-body">
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 14 }}>
                   <div className="form-group" style={{ gridColumn: '1/-1' }}>
                     <label className="form-label">Full Name *</label>
                     <input value={form.name || ''} onChange={e => inp('name', e.target.value)} required className="form-input" />
@@ -215,7 +215,7 @@ export default function Customers() {
             </div>
             <div className="modal-body">
               {/* Stats */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 20 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 12, marginBottom: 20 }}>
                 {[
                   { label: 'Total Orders', value: selected.totalOrders, color: 'var(--blue)' },
                   { label: 'Total Spent', value: fmt(selected.totalSpent), color: 'var(--green)' },
@@ -229,7 +229,7 @@ export default function Customers() {
               </div>
 
               {/* Info */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginBottom: 20 }}>
                 {[
                   ['Phone', selected.phone || '—'],
                   ['City', selected.city || '—'],

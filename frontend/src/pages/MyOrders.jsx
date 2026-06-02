@@ -47,7 +47,7 @@ export default function MyOrders() {
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0b1a0e", padding: "40px 24px" }}>
+    <div style={{ minHeight: "100vh", background: "#0b1a0e", padding: "clamp(20px, 4vw, 40px) clamp(12px, 4vw, 24px)" }}>
       <div style={{ maxWidth: 860, margin: "0 auto" }}>
 
         {/* Header */}

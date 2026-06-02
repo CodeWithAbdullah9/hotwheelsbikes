@@ -23,6 +23,14 @@ export default function POS() {
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [barcodeInput, setBarcodeInput] = useState('');
   const [categories, setCategories] = useState(['All']);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // Responsive listener
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -663,10 +671,10 @@ ${lastOrder.items?.map(item =>
   return (
     <div style={{
       display: 'grid',
-      gridTemplateColumns: '1fr 380px',
-      gap: 20,
-      minHeight: 'calc(100vh - 80px)',
-      padding: 20
+      gridTemplateColumns: isMobile ? '1fr' : '1fr 380px',
+      gap: isMobile ? 16 : 20,
+      minHeight: isMobile ? 'auto' : 'calc(100vh - 80px)',
+      padding: isMobile ? '12px 8px' : 20
     }}>
       {/* Products Section */}
       <div style={{ overflow: 'auto' }}>
@@ -681,7 +689,7 @@ ${lastOrder.items?.map(item =>
             </h2>
 
             {/* Stats Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, marginTop: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(5, 1fr)', gap: isMobile ? 8 : 12, marginTop: 16 }}>
               <div style={{ background: 'var(--surface)', padding: 12, borderRadius: 12, textAlign: 'center' }}>
                 <div style={{ fontSize: 24, fontWeight: 'bold', color: '#4ade80' }}>{products.length}</div>
                 <div style={{ fontSize: 11, color: 'var(--muted)' }}>Total Products</div>
@@ -706,27 +714,29 @@ ${lastOrder.items?.map(item =>
           </div>
 
           {/* Search and Barcode */}
-          <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
-            <div style={{ flex: 1, position: 'relative' }}>
+          <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: isMobile ? '100%' : 0, position: 'relative' }}>
               <input
                 ref={searchInputRef}
                 type="text"
-                placeholder="Search products by name, SKU, or description... (Press / to focus)"
+                placeholder={isMobile ? "Search products..." : "Search products by name, SKU, or description... (Press / to focus)"}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                style={{ padding: '14px 16px', borderRadius: 14, width: '100%', background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text)' }}
+                style={{ padding: '12px 16px', borderRadius: 14, width: '100%', background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text)' }}
               />
             </div>
-            <div style={{ position: 'relative', width: 200 }}>
-              <input
-                type="text"
-                placeholder="Scan Barcode"
-                value={barcodeInput}
-                onChange={(e) => setBarcodeInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleBarcodeSearch()}
-                style={{ padding: '14px 16px', borderRadius: 14, width: '100%', background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text)' }}
-              />
-            </div>
+            {!isMobile && (
+              <div style={{ position: 'relative', width: 200 }}>
+                <input
+                  type="text"
+                  placeholder="Scan Barcode"
+                  value={barcodeInput}
+                  onChange={(e) => setBarcodeInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleBarcodeSearch()}
+                  style={{ padding: '12px 16px', borderRadius: 14, width: '100%', background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text)' }}
+                />
+              </div>
+            )}
           </div>
 
           {/* Category Filter */}
