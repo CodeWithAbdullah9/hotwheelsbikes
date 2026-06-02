@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5190,
+    host: true, // Allow access from other devices on the same network
     proxy: {
       '/api': { target: 'http://localhost:5001', changeOrigin: true },
       '/uploads': { target: 'http://localhost:5001', changeOrigin: true },

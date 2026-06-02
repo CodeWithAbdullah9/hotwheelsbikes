@@ -4,6 +4,7 @@ import { ArrowRight, Zap, Shield, Truck, Star, ChevronRight, Phone, Award, Users
 import ProductCard from "../components/ProductCard";
 import { accessories } from "../data/products";
 import axios from "axios";
+import { useWindowWidth } from "../hooks/useWindowWidth";
 
 // ─── Theme tokens ────────────────────────────────────────────────────────────
 const T = {
@@ -18,8 +19,6 @@ const T = {
   border: "rgba(74,222,128,0.15)",
   borderMid: "rgba(74,222,128,0.25)",
 };
-
-const featured = [];
 
 const cats = [
   { label: "Kid's Bike", sub: "Ages 3–10", path: "/shop?category=KID'S+BIKE", img: "https://hotwheelsbikes.com/wp-content/uploads/2024/10/02bc13e51e4d60cf118138e5c0dc99ed.jpg_720x720q80.jpg_-1.webp" },
@@ -37,7 +36,7 @@ const trust = [
 
 // ─── Layout helpers ──────────────────────────────────────────────────────────
 const W = ({ children, style = {} }) => (
-  <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 40px", ...style }}>
+  <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(16px, 4vw, 40px)", ...style }}>
     {children}
   </div>
 );
@@ -52,7 +51,7 @@ const SectionHead = ({ label, title, center = false }) => (
       {label}
     </p>
     <h2 style={{
-      color: T.textMain, fontSize: 38, fontWeight: 700,
+      color: T.textMain, fontSize: "clamp(24px, 4vw, 38px)", fontWeight: 700,
       fontFamily: "'Rajdhani',sans-serif", letterSpacing: "0.03em",
     }}>
       {title}
@@ -81,12 +80,14 @@ const SectionDivider = ({ bg = T.bgBase }) => (
 
 export default function Home() {
   const [featured, setFeatured] = useState([]);
+  const width = useWindowWidth();
+  const isMobile = width < 768;
+  const sectionPad = isMobile ? "56px 0" : "96px 0";
 
   useEffect(() => {
     axios.get('/api/products/public')
       .then(res => {
         if (res.data.success && res.data.products) {
-          // First 8 products as featured
           setFeatured(res.data.products.slice(0, 8));
         }
       })
@@ -100,18 +101,15 @@ export default function Home() {
           1. HERO
       ══════════════════════════════════════════════════════════════════════ */}
       <section style={{ position: "relative", minHeight: "92vh", display: "flex", alignItems: "center", overflow: "hidden" }}>
-        {/* Background image */}
         <div style={{
           position: "absolute", inset: 0,
           backgroundImage: "url('https://hotwheelsbikes.com/wp-content/uploads/2024/10/c634106062727b64f1aa761126e57295.jpg_720x720q80.jpg')",
           backgroundSize: "cover", backgroundPosition: "center 30%",
         }} />
-        {/* Overlay */}
         <div style={{
           position: "absolute", inset: 0,
           background: "linear-gradient(115deg,rgba(5,20,10,0.90) 0%,rgba(7,35,18,0.70) 50%,rgba(5,20,10,0.35) 100%)",
         }} />
-        {/* Ambient glow */}
         <div style={{
           position: "absolute", top: "20%", right: "15%",
           width: 520, height: 520,
@@ -125,8 +123,13 @@ export default function Home() {
           filter: "blur(90px)", pointerEvents: "none",
         }} />
 
-        <W style={{ position: "relative", zIndex: 1, width: "100%", paddingTop: 110, paddingBottom: 110 }}>
-          <div className="hero-two-col" style={{ display: "grid", gridTemplateColumns: "1fr 420px", gap: 64, alignItems: "center" }}>
+        <W style={{ position: "relative", zIndex: 1, width: "100%", paddingTop: isMobile ? 80 : 110, paddingBottom: isMobile ? 80 : 110 }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: isMobile ? "1fr" : "1fr 420px",
+            gap: isMobile ? 32 : 64,
+            alignItems: "center",
+          }}>
 
             {/* ── Left: copy ── */}
             <div className="slide-in-left">
@@ -142,83 +145,82 @@ export default function Home() {
               </div>
 
               <h1 style={{ fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, lineHeight: 0.88, marginBottom: 30 }}>
-                <span style={{ display: "block", fontSize: "clamp(58px,7.5vw,96px)", color: T.textMain, letterSpacing: "-0.02em" }}>RIDE</span>
-                <span style={{ display: "block", fontSize: "clamp(58px,7.5vw,96px)", color: T.green, letterSpacing: "-0.02em" }}>BEYOND</span>
-                <span style={{ display: "block", fontSize: "clamp(58px,7.5vw,96px)", color: T.textMain, letterSpacing: "-0.02em" }}>LIMITS</span>
+                <span style={{ display: "block", fontSize: isMobile ? "clamp(44px,12vw,72px)" : "clamp(58px,7.5vw,96px)", color: T.textMain, letterSpacing: "-0.02em" }}>RIDE</span>
+                <span style={{ display: "block", fontSize: isMobile ? "clamp(44px,12vw,72px)" : "clamp(58px,7.5vw,96px)", color: T.green, letterSpacing: "-0.02em" }}>BEYOND</span>
+                <span style={{ display: "block", fontSize: isMobile ? "clamp(44px,12vw,72px)" : "clamp(58px,7.5vw,96px)", color: T.textMain, letterSpacing: "-0.02em" }}>LIMITS</span>
               </h1>
 
-              <p style={{ color: T.textBody, fontSize: 17, lineHeight: 1.8, marginBottom: 42, maxWidth: 480 }}>
+              <p style={{ color: T.textBody, fontSize: isMobile ? 15 : 17, lineHeight: 1.8, marginBottom: 42, maxWidth: 480 }}>
                 Premium bicycles for every rider — from kids to professionals. Mountain, road, electric, and more.
               </p>
 
-              <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 56 }} className="hero-buttons">
-                <Link to="/shop" className="btn-primary" style={{ fontSize: 15, padding: "15px 38px", boxShadow: "0 0 40px rgba(74,222,128,0.45)" }}>
+              <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 56, flexDirection: isMobile ? "column" : "row" }} className="hero-buttons">
+                <Link to="/shop" className="btn-primary" style={{ fontSize: 15, padding: "15px 38px", boxShadow: "0 0 40px rgba(74,222,128,0.45)", textAlign: "center", justifyContent: "center" }}>
                   Shop Now <ArrowRight size={17} />
                 </Link>
-                <Link to="/about" className="btn-outline" style={{ fontSize: 15, padding: "15px 38px" }}>
+                <Link to="/about" className="btn-outline" style={{ fontSize: 15, padding: "15px 38px", textAlign: "center", justifyContent: "center" }}>
                   Our Story
                 </Link>
               </div>
 
-              {/* Stats row */}
-              <div style={{ display: "flex", gap: 48, paddingTop: 32, borderTop: "1px solid rgba(74,222,128,0.18)" }}>
+              <div style={{ display: "flex", gap: isMobile ? 24 : 48, paddingTop: 32, borderTop: "1px solid rgba(74,222,128,0.18)" }}>
                 {[
                   { v: "35+", l: "Years" },
                   { v: "500+", l: "Bikes" },
                   { v: "10K+", l: "Riders" },
                 ].map((s) => (
                   <div key={s.l}>
-                    <p style={{ fontSize: 38, fontWeight: 900, color: T.textMain, fontFamily: "'Rajdhani',sans-serif", lineHeight: 1 }}>{s.v}</p>
+                    <p style={{ fontSize: isMobile ? 28 : 38, fontWeight: 900, color: T.textMain, fontFamily: "'Rajdhani',sans-serif", lineHeight: 1 }}>{s.v}</p>
                     <p style={{ fontSize: 11, color: T.textMuted, marginTop: 6, textTransform: "uppercase", letterSpacing: "0.18em" }}>{s.l}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* ── Right: deal card ── */}
-            <div className="hero-right-col scale-in" style={{
-              background: "rgba(11,26,14,0.78)", backdropFilter: "blur(28px)",
-              border: "1px solid rgba(74,222,128,0.28)", borderRadius: 24, padding: 38,
-              boxShadow: "0 24px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(74,222,128,0.12)",
-            }}>
-              <div style={{
-                display: "inline-block", background: T.green, color: "#000",
-                fontSize: 11, fontWeight: 800, padding: "6px 14px",
-                borderRadius: 8, marginBottom: 24, letterSpacing: "0.1em",
-              }} className="wiggle">
-                <Flame size={12} style={{ display: "inline", verticalAlign: "middle", marginRight: 4 }} /> HOT DEAL
+            {/* ── Right: deal card — hidden on mobile ── */}
+            {!isMobile && (
+              <div className="hero-right-col scale-in" style={{
+                background: "rgba(11,26,14,0.78)", backdropFilter: "blur(28px)",
+                border: "1px solid rgba(74,222,128,0.28)", borderRadius: 24, padding: 38,
+                boxShadow: "0 24px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(74,222,128,0.12)",
+              }}>
+                <div style={{
+                  display: "inline-block", background: T.green, color: "#000",
+                  fontSize: 11, fontWeight: 800, padding: "6px 14px",
+                  borderRadius: 8, marginBottom: 24, letterSpacing: "0.1em",
+                }} className="wiggle">
+                  <Flame size={12} style={{ display: "inline", verticalAlign: "middle", marginRight: 4 }} /> HOT DEAL
+                </div>
+                <h3 style={{ color: T.textMain, fontSize: 28, fontWeight: 700, marginBottom: 12, fontFamily: "'Rajdhani',sans-serif", letterSpacing: "0.02em" }}>
+                  Up to 50% OFF
+                </h3>
+                <p style={{ color: T.textMuted, fontSize: 14, marginBottom: 26, lineHeight: 1.7 }}>
+                  On selected mountain bikes, road bikes, and electric scooters. Limited time offer.
+                </p>
+                <div style={{ borderTop: "1px solid rgba(74,222,128,0.18)", paddingTop: 24, marginBottom: 26 }}>
+                  <p style={{ color: T.textMuted, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.16em", marginBottom: 8 }}>Starting from</p>
+                  <p style={{ color: T.green, fontSize: 44, fontWeight: 900, fontFamily: "'Rajdhani',sans-serif", lineHeight: 1 }}>₨ 24,500</p>
+                </div>
+                <div style={{ display: "flex", gap: 10, marginBottom: 26 }}>
+                  {["Free Delivery", "Genuine", "Warranty"].map((b) => (
+                    <span key={b} style={{
+                      fontSize: 10, fontWeight: 700, color: T.green,
+                      background: "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.2)",
+                      padding: "4px 10px", borderRadius: 99, letterSpacing: "0.08em",
+                      display: "inline-flex", alignItems: "center", gap: 4,
+                    }}>
+                      <Star size={9} fill={T.green} stroke="none" /> {b}
+                    </span>
+                  ))}
+                </div>
+                <Link to="/shop" className="btn-primary" style={{ justifyContent: "center", width: "100%", padding: "14px 0", fontSize: 14 }}>
+                  Browse All Bikes <ArrowRight size={15} />
+                </Link>
               </div>
-              <h3 style={{ color: T.textMain, fontSize: 28, fontWeight: 700, marginBottom: 12, fontFamily: "'Rajdhani',sans-serif", letterSpacing: "0.02em" }}>
-                Up to 50% OFF
-              </h3>
-              <p style={{ color: T.textMuted, fontSize: 14, marginBottom: 26, lineHeight: 1.7 }}>
-                On selected mountain bikes, road bikes, and electric scooters. Limited time offer.
-              </p>
-              <div style={{ borderTop: "1px solid rgba(74,222,128,0.18)", paddingTop: 24, marginBottom: 26 }}>
-                <p style={{ color: T.textMuted, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.16em", marginBottom: 8 }}>Starting from</p>
-                <p style={{ color: T.green, fontSize: 44, fontWeight: 900, fontFamily: "'Rajdhani',sans-serif", lineHeight: 1 }}>₨ 24,500</p>
-              </div>
-              {/* Mini trust badges */}
-              <div style={{ display: "flex", gap: 10, marginBottom: 26 }}>
-                {["Free Delivery", "Genuine", "Warranty"].map((b) => (
-                  <span key={b} style={{
-                    fontSize: 10, fontWeight: 700, color: T.green,
-                    background: "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.2)",
-                    padding: "4px 10px", borderRadius: 99, letterSpacing: "0.08em",
-                    display: "inline-flex", alignItems: "center", gap: 4,
-                  }}>
-                    <Star size={9} fill={T.green} stroke="none" /> {b}
-                  </span>
-                ))}
-              </div>
-              <Link to="/shop" className="btn-primary" style={{ justifyContent: "center", width: "100%", padding: "14px 0", fontSize: 14 }}>
-                Browse All Bikes <ArrowRight size={15} />
-              </Link>
-            </div>
+            )}
           </div>
         </W>
 
-        {/* Bottom fade */}
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 100, background: `linear-gradient(to top,${T.bgBase},transparent)`, pointerEvents: "none" }} />
       </section>
 
@@ -228,13 +230,11 @@ export default function Home() {
           2. TRUST BAR
       ══════════════════════════════════════════════════════════════════════ */}
       <section style={{ background: T.bgSurface, position: "relative", overflow: "hidden" }}>
-        {/* Subtle diagonal lines pattern */}
         <div style={{
           position: "absolute", inset: 0,
           backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(74,222,128,0.02) 35px, rgba(74,222,128,0.02) 70px)",
           pointerEvents: "none",
         }} />
-        {/* Small glow accent */}
         <div style={{
           position: "absolute", top: "50%", right: "10%",
           width: 200, height: 200,
@@ -242,15 +242,22 @@ export default function Home() {
           filter: "blur(60px)", pointerEvents: "none",
         }} />
         <W style={{ position: "relative", zIndex: 1 }}>
-          <div className="trust-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 0 }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)",
+            gap: 0,
+          }}>
             {trust.map((item, i) => (
               <div
                 key={item.title}
                 className={`fade-up stagger-${i + 1}`}
                 style={{
                   display: "flex", alignItems: "center", gap: 16,
-                  padding: "26px 22px",
-                  borderRight: i < 3 ? `1px solid ${T.border}` : "none",
+                  padding: isMobile ? "20px 14px" : "26px 22px",
+                  borderRight: isMobile
+                    ? (i % 2 === 0 ? `1px solid ${T.border}` : "none")
+                    : (i < 3 ? `1px solid ${T.border}` : "none"),
+                  borderBottom: isMobile && i < 2 ? `1px solid ${T.border}` : "none",
                   transition: "background 0.2s",
                 }}
                 onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(74,222,128,0.05)"; }}
@@ -279,15 +286,13 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════════════════════════
           3. CATEGORIES
       ══════════════════════════════════════════════════════════════════════ */}
-      <section style={{ padding: "96px 0", background: T.bgBase, position: "relative", overflow: "hidden" }}>
-        {/* Hexagon pattern */}
+      <section style={{ padding: sectionPad, background: T.bgBase, position: "relative", overflow: "hidden" }}>
         <div style={{
           position: "absolute", inset: 0,
           backgroundImage: `radial-gradient(circle, rgba(74,222,128,0.03) 1px, transparent 1px)`,
           backgroundSize: "30px 30px",
           pointerEvents: "none",
         }} />
-        {/* Corner glow */}
         <div style={{
           position: "absolute", top: "-10%", left: "-5%",
           width: 400, height: 400,
@@ -295,11 +300,15 @@ export default function Home() {
           filter: "blur(80px)", pointerEvents: "none",
         }} />
         <W style={{ position: "relative", zIndex: 1 }}>
-          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 48 }}>
+          <div style={{ display: "flex", alignItems: isMobile ? "flex-start" : "flex-end", justifyContent: "space-between", marginBottom: 48, flexDirection: isMobile ? "column" : "row", gap: isMobile ? 12 : 0 }}>
             <SectionHead label="Browse by Type" title="SHOP BY CATEGORY" />
             <Link to="/shop" className="btn-link">View All <ChevronRight size={15} /></Link>
           </div>
-          <div className="cat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20 }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)",
+            gap: isMobile ? 12 : 20,
+          }}>
             {cats.map((cat, index) => (
               <Link
                 key={cat.label}
@@ -327,13 +336,11 @@ export default function Home() {
                   onMouseLeave={(e) => { e.target.style.transform = "scale(1)"; }}
                   onError={(e) => { e.target.src = `https://placehold.co/300x400/0f2214/4ade80?text=${cat.label}`; }}
                 />
-                {/* Gradient overlay */}
                 <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(5,20,10,0.95) 0%,rgba(5,20,10,0.3) 50%,transparent 100%)" }} />
-                {/* Top shimmer */}
                 <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg,transparent,rgba(74,222,128,0.4),transparent)" }} />
-                <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "24px 22px" }}>
+                <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: isMobile ? "16px 14px" : "24px 22px" }}>
                   <p style={{ color: T.green, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.24em", marginBottom: 6 }}>{cat.sub}</p>
-                  <h3 style={{ color: T.textMain, fontSize: 20, fontWeight: 700, fontFamily: "'Rajdhani',sans-serif", letterSpacing: "0.05em" }}>{cat.label}</h3>
+                  <h3 style={{ color: T.textMain, fontSize: isMobile ? 16 : 20, fontWeight: 700, fontFamily: "'Rajdhani',sans-serif", letterSpacing: "0.05em" }}>{cat.label}</h3>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10, color: T.green, fontSize: 12, fontWeight: 600 }}>
                     Shop now <ArrowRight size={12} />
                   </div>
@@ -349,15 +356,13 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════════════════════════
           4. FEATURED PRODUCTS
       ══════════════════════════════════════════════════════════════════════ */}
-      <section style={{ padding: "96px 0", background: T.bgSurface, position: "relative", overflow: "hidden" }}>
-        {/* Grid pattern */}
+      <section style={{ padding: sectionPad, background: T.bgSurface, position: "relative", overflow: "hidden" }}>
         <div style={{
           position: "absolute", inset: 0,
           backgroundImage: "linear-gradient(rgba(74,222,128,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(74,222,128,0.025) 1px, transparent 1px)",
           backgroundSize: "40px 40px",
           pointerEvents: "none",
         }} />
-        {/* Gradient orb - bottom right */}
         <div style={{
           position: "absolute", bottom: "-15%", right: "-8%",
           width: 500, height: 500,
@@ -365,11 +370,15 @@ export default function Home() {
           pointerEvents: "none",
         }} />
         <W style={{ position: "relative", zIndex: 1 }}>
-          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 48 }}>
+          <div style={{ display: "flex", alignItems: isMobile ? "flex-start" : "flex-end", justifyContent: "space-between", marginBottom: 48, flexDirection: isMobile ? "column" : "row", gap: isMobile ? 12 : 0 }}>
             <SectionHead label="Hand-picked for you" title="FEATURED BIKES" />
             <Link to="/shop" className="btn-link">View All <ChevronRight size={15} /></Link>
           </div>
-          <div className="prod-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 22 }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)",
+            gap: isMobile ? 12 : 22,
+          }}>
             {featured.map((p, index) => (
               <div key={p.id} className={`fade-up stagger-${(index % 4) + 1}`}>
                 <ProductCard product={p} />
@@ -389,19 +398,16 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════════════════════════
           5. E-BIKES BANNER
       ══════════════════════════════════════════════════════════════════════ */}
-      <section style={{ position: "relative", padding: "110px 0", overflow: "hidden" }}>
-        {/* BG image */}
+      <section style={{ position: "relative", padding: isMobile ? "72px 0" : "110px 0", overflow: "hidden" }}>
         <div style={{
           position: "absolute", inset: 0,
           backgroundImage: "url('https://hotwheelsbikes.com/wp-content/uploads/2025/01/81e-efWTckL.jpg')",
           backgroundSize: "cover", backgroundPosition: "center right",
         }} />
-        {/* Overlay */}
         <div style={{
           position: "absolute", inset: 0,
           background: "linear-gradient(90deg,rgba(5,20,10,0.92) 0%,rgba(7,35,18,0.72) 45%,rgba(5,20,10,0.25) 100%)",
         }} />
-        {/* Decorative vertical line */}
         <div style={{
           position: "absolute", top: 0, bottom: 0, left: "48%",
           width: 1, background: "linear-gradient(to bottom,transparent,rgba(74,222,128,0.2),transparent)",
@@ -421,7 +427,7 @@ export default function Home() {
             </div>
             <h2 style={{
               fontFamily: "'Rajdhani',sans-serif", fontWeight: 700,
-              fontSize: "clamp(48px,6vw,80px)", color: T.textMain,
+              fontSize: isMobile ? "clamp(36px,10vw,56px)" : "clamp(48px,6vw,80px)", color: T.textMain,
               lineHeight: 0.88, marginBottom: 24, letterSpacing: "-0.01em",
             }}>
               POWER YOUR<br />
@@ -430,7 +436,6 @@ export default function Home() {
             <p style={{ color: T.textBody, fontSize: 16, lineHeight: 1.8, marginBottom: 44, maxWidth: 480 }}>
               Experience the future of cycling with our electric bike lineup. Built for performance, designed for everyone.
             </p>
-            {/* Feature pills */}
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 40 }}>
               {["1200W Motor", "48V Battery", "40km Range", "Anti-theft"].map((f) => (
                 <span key={f} style={{
@@ -454,25 +459,11 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════════════════════════
           6. ACCESSORIES MARQUEE
       ══════════════════════════════════════════════════════════════════════ */}
-      <section style={{ padding: "96px 0", background: T.bgBase, overflow: "hidden", position: "relative" }}>
-        {/* Wavy lines pattern */}
+      <section style={{ padding: sectionPad, background: T.bgBase, overflow: "hidden", position: "relative" }}>
         <div style={{
           position: "absolute", inset: 0,
           backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(74,222,128,0.015) 50px, rgba(74,222,128,0.015) 51px)`,
           pointerEvents: "none",
-        }} />
-        {/* Dual glows */}
-        <div style={{
-          position: "absolute", top: "30%", left: "20%",
-          width: 300, height: 300,
-          background: "rgba(34,197,94,0.04)", borderRadius: "50%",
-          filter: "blur(70px)", pointerEvents: "none",
-        }} />
-        <div style={{
-          position: "absolute", bottom: "20%", right: "25%",
-          width: 250, height: 250,
-          background: "rgba(74,222,128,0.05)", borderRadius: "50%",
-          filter: "blur(65px)", pointerEvents: "none",
         }} />
         <W style={{ position: "relative", zIndex: 1 }}>
           <div style={{ textAlign: "center", marginBottom: 56 }}>
@@ -483,7 +474,6 @@ export default function Home() {
           </div>
         </W>
         <div style={{ position: "relative" }}>
-          {/* Edge fades */}
           <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 120, background: `linear-gradient(to right,${T.bgBase},transparent)`, zIndex: 10, pointerEvents: "none" }} />
           <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 120, background: `linear-gradient(to left,${T.bgBase},transparent)`, zIndex: 10, pointerEvents: "none" }} />
           <div className="animate-marquee" style={{ display: "flex", gap: 24, width: "max-content" }}>
@@ -492,7 +482,7 @@ export default function Home() {
                 key={i}
                 className="hover-lift"
                 style={{
-                  flexShrink: 0, width: 280,
+                  flexShrink: 0, width: isMobile ? 220 : 280,
                   background: T.bgRaised, border: `1px solid ${T.border}`,
                   borderRadius: 20, overflow: "hidden",
                   transition: "all 0.3s",
@@ -507,7 +497,7 @@ export default function Home() {
                 }}
               >
                 <div style={{
-                  height: 200,
+                  height: isMobile ? 160 : 200,
                   background: T.bgSurface,
                   overflow: "hidden",
                   position: "relative",
@@ -529,13 +519,9 @@ export default function Home() {
                     onMouseEnter={(e) => { e.target.style.transform = "scale(1.08)"; }}
                     onMouseLeave={(e) => { e.target.style.transform = "scale(1)"; }}
                     onError={(e) => {
-                      console.error('Image failed to load:', acc.image);
-                      e.target.style.display = 'block';
                       e.target.src = `https://placehold.co/400x300/132a18/4ade80?text=${encodeURIComponent(acc.name.replace(/\s+/g, '+'))}`;
                     }}
                   />
-
-                  {/* Decorative gradient overlay */}
                   <div style={{
                     position: "absolute",
                     inset: 0,
@@ -571,7 +557,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* View All Button */}
         <div style={{ textAlign: "center", marginTop: 56 }}>
           <Link to="/shop?category=ACCESSORIES" className="btn-primary" style={{ fontSize: 14, padding: "15px 40px" }}>
             View All Accessories <ArrowRight size={16} />
@@ -582,17 +567,15 @@ export default function Home() {
       <SectionDivider />
 
       {/* ══════════════════════════════════════════════════════════════════════
-          7. WHY CHOOSE US
+          7. WHY CHOOSE US (Award Grid)
       ══════════════════════════════════════════════════════════════════════ */}
-      <section style={{ padding: "96px 0", background: T.bgSurface, position: "relative", overflow: "hidden" }}>
-        {/* Radial dots pattern */}
+      <section style={{ padding: sectionPad, background: T.bgSurface, position: "relative", overflow: "hidden" }}>
         <div style={{
           position: "absolute", inset: 0,
           backgroundImage: `radial-gradient(circle at 2px 2px, rgba(74,222,128,0.04) 1px, transparent 0)`,
           backgroundSize: "50px 50px",
           pointerEvents: "none",
         }} />
-        {/* Center glow */}
         <div style={{
           position: "absolute", top: "50%", left: "50%",
           transform: "translate(-50%, -50%)",
@@ -604,7 +587,11 @@ export default function Home() {
           <div style={{ textAlign: "center", marginBottom: 56 }}>
             <SectionHead label="Recognition" title="WHY CHOOSE US" center />
           </div>
-          <div className="award-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24 }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)",
+            gap: 24,
+          }}>
             {[
               {
                 icon: <Trophy size={40} />,
@@ -629,7 +616,7 @@ export default function Home() {
                 key={a.title}
                 className={`scale-in stagger-${index + 1}`}
                 style={{
-                  padding: 44, borderRadius: 24,
+                  padding: isMobile ? 28 : 44, borderRadius: 24,
                   border: a.featured ? `2px solid ${T.green}` : `1px solid ${T.borderMid}`,
                   background: a.featured ? T.green : T.bgRaised,
                   transition: "transform 0.28s, box-shadow 0.28s",
@@ -646,7 +633,6 @@ export default function Home() {
                   e.currentTarget.style.boxShadow = "none";
                 }}
               >
-                {/* Decorative corner accent for non-featured */}
                 {!a.featured && (
                   <div style={{
                     position: "absolute", top: 0, right: 0,
@@ -680,8 +666,7 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════════════════════════
           8. ABOUT SNIPPET
       ══════════════════════════════════════════════════════════════════════ */}
-      <section style={{ padding: "96px 0", background: T.bgBase, position: "relative", overflow: "hidden" }}>
-        {/* Crosshatch pattern */}
+      <section style={{ padding: sectionPad, background: T.bgBase, position: "relative", overflow: "hidden" }}>
         <div style={{
           position: "absolute", inset: 0,
           backgroundImage: `
@@ -694,7 +679,6 @@ export default function Home() {
           backgroundPosition: "0 0, 0 30px, 30px -30px, -30px 0px",
           pointerEvents: "none",
         }} />
-        {/* Left side glow */}
         <div style={{
           position: "absolute", top: "20%", left: "-10%",
           width: 450, height: 450,
@@ -702,12 +686,17 @@ export default function Home() {
           filter: "blur(90px)", pointerEvents: "none",
         }} />
         <W style={{ position: "relative", zIndex: 1 }}>
-          <div className="about-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+            gap: isMobile ? 40 : 80,
+            alignItems: "center",
+          }}>
             {/* Text col */}
             <div>
               <p style={{ color: T.green, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.22em", marginBottom: 18 }}>Since 1990</p>
               <h2 style={{
-                color: T.textMain, fontSize: "clamp(30px,4vw,48px)", fontWeight: 700,
+                color: T.textMain, fontSize: "clamp(26px,4vw,48px)", fontWeight: 700,
                 fontFamily: "'Rajdhani',sans-serif", marginBottom: 24,
                 lineHeight: 1.06, letterSpacing: "0.02em",
               }}>
@@ -719,8 +708,7 @@ export default function Home() {
               <p style={{ color: T.textMuted, fontSize: 15, lineHeight: 1.9, marginBottom: 40 }}>
                 From kids' first bikes to professional-grade mountain and road bikes, our curated range ensures every rider finds their perfect match.
               </p>
-              {/* Mini stats */}
-              <div style={{ display: "flex", gap: 32, marginBottom: 40, paddingBottom: 40, borderBottom: `1px solid ${T.border}` }}>
+              <div style={{ display: "flex", gap: isMobile ? 20 : 32, marginBottom: 40, paddingBottom: 40, borderBottom: `1px solid ${T.border}`, flexWrap: "wrap" }}>
                 {[
                   { icon: <Clock size={16} />, v: "35+", l: "Years of Trust" },
                   { icon: <Users size={16} />, v: "10K+", l: "Happy Riders" },
@@ -740,21 +728,23 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Image col */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
-              <img
-                src="https://hotwheelsbikes.com/wp-content/uploads/2024/07/Rectangle-32.png"
-                alt="Hot Wheels Bikes store"
-                style={{ borderRadius: 20, width: "100%", height: 230, objectFit: "cover", border: `1px solid ${T.border}` }}
-                onError={(e) => { e.target.src = "https://placehold.co/300x230/0f2214/4ade80?text=HotWheels"; }}
-              />
-              <img
-                src="https://hotwheelsbikes.com/wp-content/uploads/2024/07/Rectangle-31.png"
-                alt="Hot Wheels Bikes team"
-                style={{ borderRadius: 20, width: "100%", height: 230, objectFit: "cover", marginTop: 40, border: `1px solid ${T.border}` }}
-                onError={(e) => { e.target.src = "https://placehold.co/300x230/0f2214/4ade80?text=Bikes"; }}
-              />
-            </div>
+            {/* Image col — hidden on mobile to save space */}
+            {!isMobile && (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+                <img
+                  src="https://hotwheelsbikes.com/wp-content/uploads/2024/07/Rectangle-32.png"
+                  alt="Hot Wheels Bikes store"
+                  style={{ borderRadius: 20, width: "100%", height: 230, objectFit: "cover", border: `1px solid ${T.border}` }}
+                  onError={(e) => { e.target.src = "https://placehold.co/300x230/0f2214/4ade80?text=HotWheels"; }}
+                />
+                <img
+                  src="https://hotwheelsbikes.com/wp-content/uploads/2024/07/Rectangle-31.png"
+                  alt="Hot Wheels Bikes team"
+                  style={{ borderRadius: 20, width: "100%", height: 230, objectFit: "cover", marginTop: 40, border: `1px solid ${T.border}` }}
+                  onError={(e) => { e.target.src = "https://placehold.co/300x230/0f2214/4ade80?text=Bikes"; }}
+                />
+              </div>
+            )}
           </div>
         </W>
       </section>
@@ -764,19 +754,15 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════════════════════════
           9. CTA STRIP
       ══════════════════════════════════════════════════════════════════════ */}
-      <section style={{ position: "relative", padding: "100px 0", overflow: "hidden" }}>
-        {/* Layered background */}
+      <section style={{ position: "relative", padding: isMobile ? "72px 0" : "100px 0", overflow: "hidden" }}>
         <div style={{ position: "absolute", inset: 0, background: `linear-gradient(135deg,${T.bgSurface} 0%,#14532d 50%,${T.bgSurface} 100%)` }} />
-        {/* Glow orbs */}
         <div style={{ position: "absolute", top: "-35%", left: "8%", width: 560, height: 560, background: "rgba(74,222,128,0.09)", borderRadius: "50%", filter: "blur(110px)", pointerEvents: "none" }} />
         <div style={{ position: "absolute", bottom: "-35%", right: "8%", width: 440, height: 440, background: "rgba(34,197,94,0.07)", borderRadius: "50%", filter: "blur(100px)", pointerEvents: "none" }} />
-        {/* Grid texture */}
         <div style={{
           position: "absolute", inset: 0,
           backgroundImage: "linear-gradient(rgba(74,222,128,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(74,222,128,0.04) 1px,transparent 1px)",
           backgroundSize: "52px 52px", pointerEvents: "none",
         }} />
-        {/* Top border accent */}
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: `linear-gradient(90deg,transparent,${T.green},transparent)` }} />
 
         <W style={{ position: "relative", zIndex: 1 }}>
@@ -792,7 +778,7 @@ export default function Home() {
               Limited Time Offer
             </div>
             <h2 style={{
-              color: T.textMain, fontSize: "clamp(30px,4.5vw,56px)", fontWeight: 700,
+              color: T.textMain, fontSize: isMobile ? "clamp(26px,8vw,40px)" : "clamp(30px,4.5vw,56px)", fontWeight: 700,
               fontFamily: "'Rajdhani',sans-serif", marginBottom: 18,
               letterSpacing: "0.02em", lineHeight: 1.08,
             }}>
@@ -802,7 +788,7 @@ export default function Home() {
             <p style={{ color: T.textMuted, fontSize: 17, maxWidth: 500, margin: "0 auto 44px", lineHeight: 1.7 }}>
               Browse 500+ bikes across all categories. Free delivery above ₨ 5,000.
             </p>
-            <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }} className="cta-buttons">
+            <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap", flexDirection: isMobile ? "column" : "row", alignItems: "center" }}>
               <Link to="/shop" className="btn-primary" style={{ fontSize: 15, padding: "15px 48px" }}>
                 Shop All Bikes <ArrowRight size={17} />
               </Link>

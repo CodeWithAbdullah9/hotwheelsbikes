@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Award, Users, Globe, Bike, CheckCircle, Star, Zap, Rocket, TrendingUp, Earth } from "lucide-react";
+import { useWindowWidth } from "../hooks/useWindowWidth";
 
 const T = {
   bgBase: "#0b1a0e",
@@ -15,7 +16,7 @@ const T = {
 };
 
 const W = ({ children, style = {} }) => (
-  <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 32px", ...style }}>{children}</div>
+  <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(16px, 4vw, 32px)", ...style }}>{children}</div>
 );
 
 const stats = [
@@ -40,6 +41,11 @@ const values = [
 ];
 
 export default function About() {
+  const width = useWindowWidth();
+  const isMobile = width < 768;
+  const isSmall = width < 480;
+  const sectionPad = isMobile ? "56px 0" : "96px 0";
+
   return (
     <div style={{ background: T.bgBase }}>
 
@@ -110,9 +116,9 @@ export default function About() {
       </section>
 
       {/* ── Stats ── */}
-      <section style={{ padding: "64px 0", background: T.bgSurface, borderBottom: `1px solid ${T.border}` }}>
+      <section style={{ padding: isMobile ? "40px 0" : "64px 0", background: T.bgSurface, borderBottom: `1px solid ${T.border}` }}>
         <W>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16 }} className="trust-grid">
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16 }}>
             {stats.map((stat, index) => (
               <div key={stat.label}
                 className={`hover-lift scale-in stagger-${index + 1}`}
@@ -139,9 +145,9 @@ export default function About() {
       </section>
 
       {/* ── Story ── */}
-      <section style={{ padding: "96px 0", background: T.bgBase }}>
+      <section style={{ padding: sectionPad, background: T.bgBase }}>
         <W>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 72, alignItems: "center" }} className="about-grid">
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 40 : 72, alignItems: "center" }}>
             <div>
               <p style={{ color: T.green, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.22em", marginBottom: 16 }}>Who We Are</p>
               <h2 style={{
@@ -164,10 +170,10 @@ export default function About() {
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }} className="about-images">
               <img src="https://hotwheelsbikes.com/wp-content/uploads/2024/07/Rectangle-32.png" alt="Hot Wheels Bikes"
-                style={{ borderRadius: 18, width: "100%", height: 240, objectFit: "cover", border: `1px solid ${T.border}` }}
+                style={{ borderRadius: 18, width: "100%", height: isMobile ? 180 : 240, objectFit: "cover", border: `1px solid ${T.border}` }}
                 onError={e => { e.target.src = "https://placehold.co/300x240/132a18/4ade80?text=HotWheels"; }} />
               <img src="https://hotwheelsbikes.com/wp-content/uploads/2024/07/Rectangle-31.png" alt="Hot Wheels Bikes"
-                style={{ borderRadius: 18, width: "100%", height: 240, objectFit: "cover", marginTop: 36, border: `1px solid ${T.border}` }}
+                style={{ borderRadius: 18, width: "100%", height: isMobile ? 180 : 240, objectFit: "cover", marginTop: isMobile ? 0 : 36, border: `1px solid ${T.border}` }}
                 onError={e => { e.target.src = "https://placehold.co/300x240/132a18/4ade80?text=Bikes"; }} />
             </div>
           </div>
@@ -175,13 +181,13 @@ export default function About() {
       </section>
 
       {/* ── Values ── */}
-      <section style={{ padding: "96px 0", background: T.bgSurface, borderTop: `1px solid ${T.border}`, borderBottom: `1px solid ${T.border}` }}>
+      <section style={{ padding: sectionPad, background: T.bgSurface, borderTop: `1px solid ${T.border}`, borderBottom: `1px solid ${T.border}` }}>
         <W>
           <div style={{ textAlign: "center", marginBottom: 52 }}>
             <p style={{ color: T.green, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.22em", marginBottom: 12 }}>What Drives Us</p>
             <h2 style={{ color: T.textMain, fontSize: "clamp(28px,4vw,44px)", fontWeight: 700, fontFamily: "'Rajdhani',sans-serif", letterSpacing: "0.02em" }}>OUR CORE VALUES</h2>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 18 }} className="trust-grid values-grid">
+          <div style={{ display: "grid", gridTemplateColumns: isSmall ? "1fr" : isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 18 }}>
             {values.map((v, i) => (
               <div key={v.title}
                 style={{
@@ -209,8 +215,8 @@ export default function About() {
       </section>
 
       {/* ── Timeline ── */}
-      <section style={{ padding: "96px 0", background: T.bgBase }}>
-        <div style={{ maxWidth: 860, margin: "0 auto", padding: "0 32px" }}>
+      <section style={{ padding: sectionPad, background: T.bgBase }}>
+        <div style={{ maxWidth: 860, margin: "0 auto", padding: isMobile ? "0 16px" : "0 32px" }}>
           <div style={{ textAlign: "center", marginBottom: 56 }}>
             <p style={{ color: T.green, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.22em", marginBottom: 12 }}>Our Journey</p>
             <h2 style={{ color: T.textMain, fontSize: "clamp(28px,4vw,44px)", fontWeight: 700, fontFamily: "'Rajdhani',sans-serif", letterSpacing: "0.02em" }}>MILESTONES</h2>
@@ -219,7 +225,7 @@ export default function About() {
             {milestones.map((m, i) => (
               <div key={m.year} style={{ display: "flex", gap: 20, alignItems: "flex-start" }}>
                 {/* Year badge */}
-                <div style={{ flexShrink: 0, width: 80, textAlign: "right", paddingTop: 20 }}>
+                <div style={{ flexShrink: 0, width: isMobile ? 56 : 80, textAlign: "right", paddingTop: 20 }}>
                   <span style={{ color: T.green, fontSize: 20, fontWeight: 900, fontFamily: "'Rajdhani',sans-serif" }}>{m.year}</span>
                 </div>
                 {/* Line + dot */}

@@ -3,6 +3,7 @@ import { useLocation, Link, Navigate } from "react-router-dom";
 import { CheckCircle, Package, MapPin, Phone, Mail, ArrowRight, Home, Truck, User, RefreshCw, Banknote, CreditCard, Smartphone, DollarSign, ClipboardList, Settings2, Check, XCircle } from "lucide-react";
 import { formatPrice } from "../data/products";
 import axios from "axios";
+import { useWindowWidth } from "../hooks/useWindowWidth";
 
 const S = {
   page: { minHeight: "100vh", background: "#0b1a0e", padding: "48px 24px" },
@@ -32,6 +33,8 @@ export default function OrderConfirmation() {
   const [order, setOrder] = useState(state?.order || null);
   const [loading, setLoading] = useState(false);
   const [lastFetch, setLastFetch] = useState(null);
+  const width = useWindowWidth();
+  const isMobile = width < 640;
 
   const fetchOrder = async () => {
     if (!order?._id) return;
@@ -146,7 +149,7 @@ export default function OrderConfirmation() {
         </div>
 
         {/* Delivery + Payment */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16, marginBottom: 16 }}>
           <div style={{ ...S.card, marginBottom: 0 }}>
             <p style={{ color: "#f0fdf4", fontWeight: 700, fontSize: 13, marginBottom: 14 }}>Delivery Info</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
@@ -180,7 +183,7 @@ export default function OrderConfirmation() {
         </div>
 
         {/* Actions */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12, marginBottom: 16 }}>
           <Link to="/" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "14px", background: "#0f2214", border: "1px solid rgba(74,222,128,0.15)", borderRadius: 14, color: "#f0fdf4", textDecoration: "none", fontWeight: 600, fontSize: 13 }}>
             <Home size={15} /> Back to Home
           </Link>

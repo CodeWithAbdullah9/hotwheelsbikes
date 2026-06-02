@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { SlidersHorizontal, X, ChevronDown, Search, Bike } from "lucide-react";
 import ProductCard from "../components/ProductCard";
 import axios from "axios";
+import { useWindowWidth } from "../hooks/useWindowWidth";
 
 const colorOptions = ["Black", "Blue", "Green", "Orange", "Red", "Yellow", "Pink", "Purple"];
 const sizeOptions = ["50", "52", "54", "56", "58", "60"];
@@ -32,13 +33,16 @@ const categoryHero = {
 export default function Shop({ defaultCategory }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [priceRange, setPriceRange] = useState([0, 50000]);
+  const [priceRange, setPriceRange] = useState([0, 300000]);
   const [selectedColors, setSelectedColors] = useState([]);
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [sortBy, setSortBy] = useState("default");
   const [searchQuery, setSearchQuery] = useState("");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const width = useWindowWidth();
+  const isMobile = width < 768;
+  const isSmall = width < 480;
 
   const categoryParam = searchParams.get("category") || defaultCategory || "all";
   const searchParam = searchParams.get("search") || "";
@@ -97,7 +101,7 @@ export default function Shop({ defaultCategory }) {
 
   const clearFilters = () => {
     setSelectedColors([]); setSelectedSizes([]);
-    setPriceRange([0, 50000]); setSearchQuery("");
+    setPriceRange([0, 300000]); setSearchQuery("");
     setSearchParams({});
   };
 
@@ -122,7 +126,7 @@ export default function Shop({ defaultCategory }) {
   }, [products, activeCategory, searchQuery, priceRange, sortBy]);
 
   const hasActiveFilters = selectedColors.length || selectedSizes.length ||
-    priceRange[0] !== 0 || priceRange[1] !== 50000 || searchQuery.trim();
+    priceRange[0] !== 0 || priceRange[1] !== 300000 || searchQuery.trim();
 
   const categoryLabel = activeCategory === "all"
     ? "All Products"
@@ -173,7 +177,7 @@ export default function Shop({ defaultCategory }) {
           <span>Rs.{priceRange[0].toLocaleString()}</span>
           <span>Rs.{priceRange[1].toLocaleString()}</span>
         </div>
-        <input type="range" min={0} max={50000} step={500} value={priceRange[1]}
+        <input type="range" min={0} max={300000} step={5000} value={priceRange[1]}
           onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
           style={{ width: "100%" }} />
       </div>
@@ -243,7 +247,7 @@ export default function Shop({ defaultCategory }) {
         <div style={{ position: "absolute", top: "50%", right: "15%", width: 400, height: 400, background: "rgba(74,222,128,0.06)", borderRadius: "50%", filter: "blur(100px)", pointerEvents: "none" }} />
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 80, background: `linear-gradient(to top,${T.bgBase},transparent)`, pointerEvents: "none" }} />
 
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "80px 32px 64px", position: "relative", zIndex: 1 }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "80px clamp(16px,4vw,32px) 64px", position: "relative", zIndex: 1 }}>
           {/* Badge */}
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.3)", color: T.green, fontSize: 11, fontWeight: 700, padding: "6px 16px", borderRadius: 99, marginBottom: 18, letterSpacing: "0.14em", textTransform: "uppercase" }}>
             <span style={{ width: 6, height: 6, background: T.green, borderRadius: "50%", boxShadow: "0 0 6px rgba(74,222,128,0.8)" }} />
@@ -282,17 +286,11 @@ export default function Shop({ defaultCategory }) {
         </div>
       </div>
 
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "32px 32px" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "32px clamp(16px,4vw,32px)" }}>
 
-        {/* Category tabs */}
+        {/* Category tabs - dynamic from DB */}
         <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 8, marginBottom: 28 }} className="scrollbar-hide">
-          {[
-            { id: "all", label: "All Products", count: 45 },
-            { id: "Hot Wheels", label: "Hot Wheels", count: 15 },
-            { id: "Bicycles", label: "Bicycles", count: 10 },
-            { id: "Accessories", label: "Accessories", count: 10 },
-            { id: "Parts", label: "Parts", count: 10 }
-          ].map((cat) => (
+          {[{ id: "all", label: "All Products" }, ...categories.map(c => ({ id: c.id, label: c.label }))].map((cat) => (
             <button key={cat.id} onClick={() => setCategory(cat.id)}
               style={{
                 flexShrink: 0, padding: "10px 20px", borderRadius: 12, fontSize: 13, fontWeight: 700,
@@ -304,7 +302,7 @@ export default function Shop({ defaultCategory }) {
               }}
               onMouseEnter={e => { if (activeCategory !== cat.id) { e.currentTarget.style.borderColor = T.borderMid; e.currentTarget.style.color = T.green; } }}
               onMouseLeave={e => { if (activeCategory !== cat.id) { e.currentTarget.style.borderColor = T.border; e.currentTarget.style.color = T.textMuted; } }}>
-              {cat.label} ({cat.count})
+              {cat.label}
             </button>
           ))}
         </div>
@@ -320,7 +318,7 @@ export default function Shop({ defaultCategory }) {
           {/* Main */}
           <div style={{ flex: 1, minWidth: 0 }}>
             {/* Toolbar */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, gap: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, gap: 12, flexWrap: "wrap" }}>
               <button onClick={() => setFiltersOpen(true)}
                 style={{
                   display: "flex", alignItems: "center", gap: 8,
@@ -396,7 +394,7 @@ export default function Shop({ defaultCategory }) {
                 </button>
               </div>
             ) : (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))", gap: 20 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isSmall ? "1fr" : isMobile ? "repeat(2,1fr)" : "repeat(auto-fill,minmax(240px,1fr))", gap: 20 }}>
                 {filtered.map((product) => <ProductCard key={product._id} product={product} />)}
               </div>
             )}

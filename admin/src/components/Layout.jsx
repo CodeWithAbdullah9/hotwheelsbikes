@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../App'
 import {
@@ -22,24 +22,55 @@ export default function Layout() {
   const { admin, logout } = useAuth()
   const navigate = useNavigate()
   const { pathname } = useLocation()
-  const [open, setOpen] = useState(true)
+
+  // On desktop: sidebar is open by default; on mobile: closed by default
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  const [open, setOpen] = useState(window.innerWidth >= 768)
+
+  useEffect(() => {
+    const onResize = () => {
+      const mobile = window.innerWidth < 768
+      setIsMobile(mobile)
+      if (!mobile) setOpen(true) // always open on desktop
+    }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
+  // Close sidebar on mobile when navigating
+  useEffect(() => {
+    if (isMobile) setOpen(false)
+  }, [pathname, isMobile])
 
   const active = (p) => pathname === p || pathname.startsWith(p + '/')
 
+  const sidebarWidth = isMobile ? 240 : (open ? 230 : 68)
+
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
+      {/* Mobile overlay */}
+      {isMobile && open && (
+        <div
+          onClick={() => setOpen(false)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 199, backdropFilter: 'blur(2px)' }}
+        />
+      )}
+
       {/* Sidebar */}
       <aside style={{
-        width: open ? 230 : 68,
+        width: sidebarWidth,
         background: 'var(--surface)',
         borderRight: '1px solid var(--border)',
         display: 'flex', flexDirection: 'column',
         position: 'fixed', top: 0, left: 0, bottom: 0,
-        zIndex: 200, transition: 'width 0.25s ease', overflow: 'hidden',
+        zIndex: 200,
+        transition: isMobile ? 'transform 0.28s ease' : 'width 0.25s ease',
+        transform: isMobile ? (open ? 'translateX(0)' : 'translateX(-100%)') : 'translateX(0)',
+        overflow: 'hidden',
       }}>
         {/* Logo */}
-        <div style={{ padding: '18px 14px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: open ? 'space-between' : 'center', minHeight: 68 }}>
-          {open && (
+        <div style={{ padding: '18px 14px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: (open || isMobile) ? 'space-between' : 'center', minHeight: 68 }}>
+          {(open || isMobile) && (
             <div>
               <p style={{ fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, fontSize: 17, color: 'var(--text)', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Bike size={18} color="var(--green)" /> HW Admin
@@ -55,7 +86,7 @@ export default function Layout() {
         {/* Nav */}
         <nav style={{ flex: 1, padding: '14px 10px', overflowY: 'auto' }}>
           {NAV.map(({ path, label, icon: Icon }) => (
-            <button key={path} onClick={() => navigate(path)} title={!open ? label : undefined}
+            <button key={path} onClick={() => navigate(path)} title={!open && !isMobile ? label : undefined}
               style={{
                 width: '100%', display: 'flex', alignItems: 'center', gap: 11,
                 padding: '10px 13px', marginBottom: 3,
@@ -63,20 +94,20 @@ export default function Layout() {
                 border: active(path) ? '1px solid var(--borderMd)' : '1px solid transparent',
                 borderRadius: 9, color: active(path) ? 'var(--green)' : 'var(--muted)',
                 fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s',
-                justifyContent: open ? 'flex-start' : 'center',
+                justifyContent: (open || isMobile) ? 'flex-start' : 'center',
                 whiteSpace: 'nowrap', overflow: 'hidden',
               }}
               onMouseEnter={e => { if (!active(path)) e.currentTarget.style.background = 'rgba(74,222,128,0.06)' }}
               onMouseLeave={e => { if (!active(path)) e.currentTarget.style.background = 'transparent' }}
             >
               <Icon size={17} style={{ flexShrink: 0 }} />
-              {open && label}
+              {(open || isMobile) && label}
             </button>
           ))}
         </nav>
 
         {/* User */}
-        {open && (
+        {(open || isMobile) ? (
           <div style={{ padding: '12px 14px', borderTop: '1px solid var(--border)' }}>
             <div style={{ marginBottom: 10 }}>
               <p style={{ color: 'var(--text)', fontSize: 13, fontWeight: 600 }}>{admin?.name}</p>
@@ -86,8 +117,7 @@ export default function Layout() {
               <LogOut size={14} /> Logout
             </button>
           </div>
-        )}
-        {!open && (
+        ) : (
           <div style={{ padding: '12px 10px', borderTop: '1px solid var(--border)' }}>
             <button onClick={logout} title="Logout" className="btn btn-danger btn-sm" style={{ width: '100%', justifyContent: 'center', padding: 8 }}>
               <LogOut size={15} />
@@ -97,10 +127,21 @@ export default function Layout() {
       </aside>
 
       {/* Main */}
-      <div style={{ marginLeft: open ? 230 : 68, flex: 1, display: 'flex', flexDirection: 'column', transition: 'margin-left 0.25s ease' }}>
+      <div style={{
+        marginLeft: isMobile ? 0 : (open ? 230 : 68),
+        flex: 1, display: 'flex', flexDirection: 'column',
+        transition: 'margin-left 0.25s ease',
+        minWidth: 0,
+      }}>
         {/* Header */}
-        <header style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)', padding: '0 24px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
+        <header style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)', padding: '0 16px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {/* Mobile hamburger */}
+            {isMobile && (
+              <button onClick={() => setOpen(true)} className="btn btn-ghost btn-sm" style={{ padding: 8, marginRight: 4 }}>
+                <Menu size={18} />
+              </button>
+            )}
             <span style={{ color: 'var(--muted)', fontSize: 12 }}>Admin</span>
             <ChevronRight size={13} style={{ color: 'var(--muted)' }} />
             <span style={{ color: 'var(--text)', fontSize: 14, fontWeight: 600 }}>
@@ -114,7 +155,7 @@ export default function Layout() {
           </div>
         </header>
 
-        <main style={{ flex: 1, padding: 24, overflowY: 'auto' }}>
+        <main style={{ flex: 1, padding: isMobile ? '16px 12px' : 24, overflowY: 'auto', overflowX: 'hidden' }}>
           <Outlet />
         </main>
       </div>

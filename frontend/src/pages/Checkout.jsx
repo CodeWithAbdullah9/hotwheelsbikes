@@ -8,6 +8,7 @@ import {
   Truck, CheckCircle, Package, Upload, Copy, Check,
   Banknote, Building2, Smartphone, Wallet, Lock, RotateCcw, Phone, AlertTriangle
 } from "lucide-react";
+import { useWindowWidth } from "../hooks/useWindowWidth";
 
 const API = "/api";
 
@@ -54,6 +55,8 @@ export default function Checkout() {
   const { user } = useUser();
   const navigate = useNavigate();
   const fileRef = useRef();
+  const width = useWindowWidth();
+  const isMobile = width < 768;
 
   const [form, setForm] = useState({
     name: "", email: "", phone: "", address: "", city: "", postalCode: "",
@@ -173,7 +176,7 @@ export default function Checkout() {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 400px", gap: 24, alignItems: "start" }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 400px", gap: 24, alignItems: "start" }}>
 
             {/* ── LEFT ── */}
             <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
@@ -181,7 +184,7 @@ export default function Checkout() {
               {/* Customer Info */}
               <div style={S.card}>
                 <p style={S.title}><span style={S.icon}><User size={14} style={{ color: "#4ade80" }} /></span> Customer Information</p>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 14 }}>
                   <div>
                     <label style={S.label}>Full Name *</label>
                     <input value={form.name} onChange={e => inp("name", e.target.value)} required placeholder="Ahmed Khan"
@@ -334,7 +337,7 @@ export default function Checkout() {
             </div>
 
             {/* ── RIGHT — Order Summary ── */}
-            <div style={{ position: "sticky", top: 24 }}>
+            <div style={{ position: isMobile ? "static" : "sticky", top: 24 }}>
               <div style={S.card}>
                 <p style={S.title}>
                   <span style={S.icon}><ShoppingBag size={14} style={{ color: "#4ade80" }} /></span>

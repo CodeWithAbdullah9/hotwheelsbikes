@@ -24,7 +24,7 @@ import ReturnsPolicy from "./pages/ReturnsPolicy";
 import { ChevronUp, Bike } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID";
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
 export const LoaderContext = createContext(null);
 

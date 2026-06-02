@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ShoppingCart, Check, ChevronRight, Zap, Shield, Truck, RotateCcw, Heart, Minus, Plus, Bike } from "lucide-react";
 import { products, formatPrice, getDiscount } from "../data/products";
 import { useCart } from "../context/CartContext";
 import ProductCard from "../components/ProductCard";
+import { useWindowWidth } from "../hooks/useWindowWidth";
+import axios from "axios";
 
 const T = {
   bgBase: "#0b1a0e",
@@ -22,7 +24,38 @@ export default function ProductDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const product = products.find((p) => p.slug === slug);
+  const width = useWindowWidth();
+  const isMobile = width < 768;
+
+  // Try static data first (slug-based), then fetch from API (_id-based)
+  const staticProduct = products.find((p) => p.slug === slug);
+  const [apiProduct, setApiProduct] = useState(null);
+  const [apiLoading, setApiLoading] = useState(!staticProduct);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+
+  useEffect(() => {
+    if (!staticProduct) {
+      // slug is actually a MongoDB _id — fetch from API
+      setApiLoading(true);
+      axios.get(`/api/products/public`)
+        .then(res => {
+          if (res.data.success && res.data.products) {
+            const found = res.data.products.find(p => p._id === slug);
+            setApiProduct(found || null);
+            if (found) {
+              setRelatedProducts(res.data.products.filter(p => p.category === found.category && p._id !== found._id).slice(0, 4));
+            }
+          }
+        })
+        .catch(() => { })
+        .finally(() => setApiLoading(false));
+    } else {
+      // load related from static data
+      setRelatedProducts(products.filter(p => p.category === staticProduct.category && p.id !== staticProduct.id).slice(0, 4));
+    }
+  }, [slug, staticProduct]);
+
+  const product = staticProduct || apiProduct;
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedColor, setSelectedColor] = useState(product?.colors?.[0] || null);
@@ -31,6 +64,15 @@ export default function ProductDetail() {
   const [added, setAdded] = useState(false);
   const [wished, setWished] = useState(false);
   const [activeTab, setActiveTab] = useState("description");
+
+  if (apiLoading) {
+    return (
+      <div style={{ minHeight: "100vh", background: T.bgBase, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ width: 48, height: 48, border: "3px solid rgba(74,222,128,0.15)", borderTop: "3px solid #4ade80", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
+        <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -47,9 +89,11 @@ export default function ProductDetail() {
     );
   }
 
-  const discount = product.originalPrice !== product.salePrice
-    ? getDiscount(product.originalPrice, product.salePrice) : null;
-  const related = products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4);
+  const discount = (product.originalPrice || product.price) !== (product.salePrice || product.price)
+    ? getDiscount(product.originalPrice || product.price, product.salePrice || product.price) : null;
+  const productSalePrice = product.salePrice || product.price || 0;
+  const productOriginalPrice = product.originalPrice || product.price || 0;
+  const related = relatedProducts;
 
   const handleAddToCart = () => {
     addToCart(product, quantity, selectedColor, selectedSize);
@@ -62,7 +106,7 @@ export default function ProductDetail() {
 
       {/* Breadcrumb */}
       <div style={{ background: T.bgSurface, borderBottom: `1px solid ${T.border}` }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "14px 32px" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "14px clamp(16px,4vw,32px)" }}>
           <nav style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.textMuted, flexWrap: "wrap" }}>
             {[
               { label: "Home", to: "/" },
@@ -83,8 +127,8 @@ export default function ProductDetail() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "40px 32px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 56, alignItems: "start" }} className="about-grid">
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "40px clamp(16px,4vw,32px)" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 32 : 56, alignItems: "start" }}>
 
           {/* ── Images ── */}
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -154,12 +198,12 @@ export default function ProductDetail() {
             </h1>
 
             <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
-              <span style={{ fontSize: 40, fontWeight: 900, color: T.textMain, fontFamily: "'Rajdhani',sans-serif" }}>{formatPrice(product.salePrice)}</span>
-              {product.originalPrice !== product.salePrice && (
+              <span style={{ fontSize: 40, fontWeight: 900, color: T.textMain, fontFamily: "'Rajdhani',sans-serif" }}>{formatPrice(productSalePrice)}</span>
+              {productOriginalPrice > productSalePrice && (
                 <>
-                  <span style={{ fontSize: 20, color: T.textMuted, textDecoration: "line-through", opacity: 0.6 }}>{formatPrice(product.originalPrice)}</span>
+                  <span style={{ fontSize: 20, color: T.textMuted, textDecoration: "line-through", opacity: 0.6 }}>{formatPrice(productOriginalPrice)}</span>
                   <span style={{ background: "rgba(74,222,128,0.1)", color: T.green, fontSize: 13, fontWeight: 800, padding: "4px 12px", borderRadius: 10, border: `1px solid ${T.borderMid}` }}>
-                    Save {formatPrice(product.originalPrice - product.salePrice)}
+                    Save {formatPrice(productOriginalPrice - productSalePrice)}
                   </span>
                 </>
               )}
@@ -307,7 +351,7 @@ export default function ProductDetail() {
 
           {activeTab === "specs" && product.specs && (
             <div style={{ background: T.bgRaised, border: `1px solid ${T.border}`, borderRadius: 20, padding: 28 }}>
-              <ul style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, listStyle: "none" }}>
+              <ul style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12, listStyle: "none" }}>
                 {product.specs.map((spec, i) => (
                   <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 14, color: T.textMuted }}>
                     <span style={{ width: 20, height: 20, background: "rgba(74,222,128,0.1)", color: T.green, border: `1px solid ${T.borderMid}`, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>
@@ -334,7 +378,7 @@ export default function ProductDetail() {
                 View All <ChevronRight size={15} />
               </Link>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20 }} className="prod-grid">
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 20 }}>
               {related.map((p) => <ProductCard key={p.id} product={p} />)}
             </div>
           </div>

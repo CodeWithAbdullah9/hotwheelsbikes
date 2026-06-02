@@ -12,7 +12,7 @@ export default function CartDrawer() {
     <>
       <div className="fixed inset-0 bg-black/70 z-50 backdrop-blur-sm" onClick={() => setIsCartOpen(false)} />
 
-      <div className="fixed right-0 top-0 h-full w-full max-w-[400px] bg-[#0d0d0d] border-l border-[#4ade80]/10 z-50 shadow-2xl flex flex-col fade-up">
+      <div className="fixed right-0 top-0 h-full w-full max-w-[400px] bg-[#0d0d0d] border-l border-[#4ade80]/10 z-50 shadow-2xl flex flex-col fade-up" style={{ maxWidth: "min(400px, 100vw)" }}>
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-[#4ade80]/10">
@@ -59,7 +59,7 @@ export default function CartDrawer() {
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-semibold text-white line-clamp-2 leading-snug mb-0.5">{item.name}</h4>
                   {item.selectedColor && <p className="text-[11px] text-gray-500">Color: {item.selectedColor}</p>}
-                  {item.selectedSize  && <p className="text-[11px] text-gray-500">Size: {item.selectedSize}</p>}
+                  {item.selectedSize && <p className="text-[11px] text-gray-500">Size: {item.selectedSize}</p>}
                   <p className="text-[#4ade80] font-bold text-sm mt-1">{formatPrice(item.salePrice)}</p>
                   <div className="flex items-center justify-between mt-2">
                     <div className="flex items-center bg-[#111] border border-[#4ade80]/10 rounded-lg overflow-hidden">

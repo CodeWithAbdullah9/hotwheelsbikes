@@ -4,6 +4,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import { useUser } from "../context/UserContext";
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Bike } from "lucide-react";
+import { useWindowWidth } from "../hooks/useWindowWidth";
 
 const S = {
   page: { minHeight: "100vh", background: "#0b1a0e", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px", position: "relative", overflow: "hidden" },
@@ -18,6 +19,8 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || "/";
+  const width = useWindowWidth();
+  const isMobile = width < 480;
 
   const [tab, setTab] = useState("login"); // login | register
   const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
@@ -73,7 +76,7 @@ export default function Login() {
       <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle,rgba(74,222,128,0.07) 0%,transparent 70%)", pointerEvents: "none" }} />
       <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(74,222,128,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(74,222,128,0.03) 1px,transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
 
-      <div style={S.card}>
+      <div style={{ ...S.card, padding: isMobile ? "28px 16px" : "36px 32px" }}>
         {/* Logo */}
         <div style={{ textAlign: "center", marginBottom: 28 }}>
           <div style={{ width: 56, height: 56, borderRadius: "50%", background: "linear-gradient(135deg,#16a34a,#4ade80)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}><Bike size={26} color="#000" /></div>

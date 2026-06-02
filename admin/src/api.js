@@ -1,6 +1,9 @@
 import axios from 'axios'
 
-const api = axios.create({ baseURL: '/api' })
+// Use environment variable if set (for production/other devices), otherwise use Vite proxy
+const baseURL = import.meta.env.VITE_API_URL || '/api'
+
+const api = axios.create({ baseURL })
 
 api.interceptors.request.use(cfg => {
   const token = localStorage.getItem('hw_token')

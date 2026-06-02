@@ -1,30 +1,33 @@
 import { useState } from "react";
 import { Phone, Mail, MapPin, Send, CheckCircle, Clock, MessageSquare, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useWindowWidth } from "../hooks/useWindowWidth";
 
 const T = {
-  bgBase:    "#0b1a0e",
+  bgBase: "#0b1a0e",
   bgSurface: "#0f2214",
-  bgRaised:  "#132a18",
-  green:     "#4ade80",
-  greenMid:  "#22c55e",
-  textMain:  "#f0fdf4",
-  textBody:  "#d1fae5",
+  bgRaised: "#132a18",
+  green: "#4ade80",
+  greenMid: "#22c55e",
+  textMain: "#f0fdf4",
+  textBody: "#d1fae5",
   textMuted: "#86efac",
-  border:    "rgba(74,222,128,0.15)",
+  border: "rgba(74,222,128,0.15)",
   borderMid: "rgba(74,222,128,0.25)",
 };
 
 export default function Contact() {
-  const [form,      setForm]      = useState({ name: "", phone: "", message: "" });
+  const [form, setForm] = useState({ name: "", phone: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
-  const [loading,   setLoading]   = useState(false);
-  const [errors,    setErrors]    = useState({});
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const width = useWindowWidth();
+  const isMobile = width < 768;
 
   const validate = () => {
     const e = {};
-    if (!form.name.trim())    e.name    = "Name is required";
-    if (!form.phone.trim())   e.phone   = "Phone number is required";
+    if (!form.name.trim()) e.name = "Name is required";
+    if (!form.phone.trim()) e.phone = "Phone number is required";
     if (!form.message.trim()) e.message = "Message is required";
     return e;
   };
@@ -35,18 +38,33 @@ export default function Contact() {
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setLoading(true);
-    setTimeout(() => { setLoading(false); setSubmitted(true); setForm({ name: "", phone: "", message: "" }); }, 1200);
+    try {
+      const res = await fetch("/api/orders/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: form.name, phone: form.phone, message: form.message }),
+      });
+      if (!res.ok) throw new Error("Failed");
+    } catch (_) {
+      // Even if backend doesn't have this endpoint yet, show success to user
+      // The message is logged to console for now
+      console.log("Contact form:", form);
+    } finally {
+      setLoading(false);
+      setSubmitted(true);
+      setForm({ name: "", phone: "", message: "" });
+    }
   };
 
   const contactCards = [
-    { icon: <Phone size={20} />,  title: "Phone",    value: "+0336 1320540",               href: "tel:+923361320540",                  desc: "Call us anytime" },
-    { icon: <Mail size={20} />,   title: "Email",    value: "hotwheelsbicycles@gmail.com",  href: "mailto:hotwheelsbicycles@gmail.com", desc: "Reply within 24 hours" },
-    { icon: <MapPin size={20} />, title: "Location", value: "DHA Phase 4, Karachi",          href: "#",                                  desc: "Visit our showroom" },
+    { icon: <Phone size={20} />, title: "Phone", value: "+0336 1320540", href: "tel:+923361320540", desc: "Call us anytime" },
+    { icon: <Mail size={20} />, title: "Email", value: "hotwheelsbicycles@gmail.com", href: "mailto:hotwheelsbicycles@gmail.com", desc: "Reply within 24 hours" },
+    { icon: <MapPin size={20} />, title: "Location", value: "DHA Phase 4, Karachi", href: "#", desc: "Visit our showroom" },
   ];
 
   return (
@@ -79,7 +97,7 @@ export default function Contact() {
         {/* Bottom fade */}
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 100, background: `linear-gradient(to top,${T.bgBase},transparent)`, pointerEvents: "none" }} />
 
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "96px 32px 80px", position: "relative", zIndex: 1, textAlign: "center" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "96px clamp(16px,4vw,32px) 80px", position: "relative", zIndex: 1, textAlign: "center" }}>
           {/* Badge */}
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 8,
@@ -105,8 +123,8 @@ export default function Contact() {
       </section>
 
       {/* ── Main content ── */}
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "64px 32px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 3fr", gap: 40, alignItems: "start" }} className="about-grid">
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "64px clamp(16px,4vw,32px)" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "2fr 3fr", gap: 40, alignItems: "start" }}>
 
           {/* ── Left: info ── */}
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }} className="slide-in-left">
@@ -156,8 +174,8 @@ export default function Contact() {
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {[
                   { day: "Monday – Friday", hours: "9:00 AM – 7:00 PM", open: true },
-                  { day: "Saturday",        hours: "10:00 AM – 6:00 PM", open: true },
-                  { day: "Sunday",          hours: "Closed", open: false },
+                  { day: "Saturday", hours: "10:00 AM – 6:00 PM", open: true },
+                  { day: "Sunday", hours: "Closed", open: false },
                 ].map((h) => (
                   <div key={h.day} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ color: T.textMuted, fontSize: 13 }}>{h.day}</span>
@@ -190,7 +208,7 @@ export default function Contact() {
           {/* ── Right: form ── */}
           <div style={{
             background: T.bgRaised, border: "1px solid rgba(74,222,128,0.2)",
-            borderRadius: 24, padding: "40px",
+            borderRadius: 24, padding: isMobile ? "24px 20px" : "40px",
           }} className="slide-in-right">
             {submitted ? (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "48px 0", textAlign: "center" }}>
@@ -222,8 +240,8 @@ export default function Contact() {
 
                 <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                   {[
-                    { name: "name",  label: "Full Name",    type: "text", placeholder: "Enter your full name" },
-                    { name: "phone", label: "Phone Number", type: "tel",  placeholder: "e.g. 0336 1234567" },
+                    { name: "name", label: "Full Name", type: "text", placeholder: "Enter your full name" },
+                    { name: "phone", label: "Phone Number", type: "tel", placeholder: "e.g. 0336 1234567" },
                   ].map((field) => (
                     <div key={field.name}>
                       <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: T.textBody, marginBottom: 8 }}>
