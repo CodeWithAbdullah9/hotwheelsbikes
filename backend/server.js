@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const session = require('express-session');
 const passport = require('./middleware/passport');
 
 const app = express();
@@ -15,9 +14,12 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
-app.use(session({ secret: process.env.SESSION_SECRET || 'hw_secret', resave: false, saveUninitialized: false }));
+// Note: No session middleware — auth is JWT-based, sessions not needed
 app.use(passport.initialize());
 app.use('/uploads', express.static('uploads'));
+
+// Root route — confirms server is alive
+app.get('/', (_, res) => res.json({ status: 'Hot Wheels Bikes API', version: '1.0.0', health: '/api/health' }));
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
