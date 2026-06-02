@@ -6,7 +6,13 @@ node_modules/
 .env
 .env.local
 .env.production
+.env.development
 backend/.env
+admin/.env.local
+frontend/.env.local
+*/.env
+*/.env.local
+*/.env.production
 
 # Build outputs
 dist/
@@ -27,9 +33,30 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
-# Uploads (user uploaded files)
+# Uploads (user uploaded files — stored on server, not in repo)
 backend/uploads/
 
 # IDE
 .vscode/
 .idea/
+
+# Temp / debug files
+FIXES_COMPLETED.md
+backend/checkData.js
+backend/checkCategories.js
+backend/checkExistingSKUs.js
+backend/checkProductImages.js
+backend/addMoreProducts.js
+backend/addSampleOrders.js
+backend/setupImages.js
+backend/seedWebProducts.js
+backend/addProducts45.js
+frontend/src/pages/ShopClean.jsx
+frontend/src/pages/ShopComplete.jsx
+frontend/src/pages/ShopDebug.jsx
+frontend/src/pages/ShopFinal.jsx
+frontend/src/pages/ShopFixed.jsx
+frontend/src/pages/ShopSimple.jsx
+frontend/src/pages/ShopTest.jsx
+frontend/src/pages/ShopWorking.jsx
+frontend/src/testAPI.js
