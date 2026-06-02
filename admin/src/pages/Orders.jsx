@@ -29,37 +29,20 @@ export default function Orders() {
     try {
       const { data } = await api.get('/orders', { params: { page: p, limit: 15, ...filters } })
       setOrders(data.orders); setTotal(data.total); setPages(data.pages); setPage(p)
-
-      // Calculate stats
-      const pending = data.orders.filter(o => o.status === 'pending').length
-      const processing = data.orders.filter(o => o.status === 'processing').length
-      const shipped = data.orders.filter(o => o.status === 'shipped').length
-      const delivered = data.orders.filter(o => o.status === 'delivered').length
-      const cancelled = data.orders.filter(o => o.status === 'cancelled').length
-      const totalRevenue = data.orders.reduce((sum, o) => sum + o.total, 0)
-      const onlineOrders = data.orders.filter(o => o.source === 'online').length
-      const posOrders = data.orders.filter(o => o.source === 'pos').length
-
-      setStats({
-        total: data.total,
-        pending,
-        processing,
-        shipped,
-        delivered,
-        cancelled,
-        totalRevenue,
-        onlineOrders,
-        posOrders
-      })
     } finally { setLoading(false) }
+  }
+
+  const loadStats = async () => {
+    try {
+      const { data } = await api.get('/orders/stats/summary')
+      setStats(data)
+    } catch { /* ignore */ }
   }
 
   useEffect(() => {
     load(1)
-
-    // Auto-refresh every 15 seconds
-    const interval = setInterval(() => load(page), 15000)
-
+    loadStats()
+    const interval = setInterval(() => { load(page); loadStats() }, 15000)
     return () => clearInterval(interval)
   }, [filters])
 

@@ -17,6 +17,10 @@ const S = {
 const PAYMENT_INFO = {
   cod: { label: "Cash on Delivery", icon: <Banknote size={28} />, color: "#fbbf24" },
   card: { label: "Card Payment", icon: <CreditCard size={28} />, color: "#60a5fa" },
+  bank_transfer: { label: "Bank Transfer", icon: <CreditCard size={28} />, color: "#60a5fa" },
+  jazzcash: { label: "JazzCash", icon: <Smartphone size={28} />, color: "#c084fc" },
+  easypaisa: { label: "EasyPaisa", icon: <Smartphone size={28} />, color: "#22c55e" },
+  stripe: { label: "Card (Stripe)", icon: <CreditCard size={28} />, color: "#818cf8" },
   online: { label: "Online Transfer", icon: <Smartphone size={28} />, color: "#c084fc" },
   cash: { label: "Cash", icon: <DollarSign size={28} />, color: "#fbbf24" },
 };

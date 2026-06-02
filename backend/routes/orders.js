@@ -6,6 +6,23 @@ const Customer = require('../models/Customer');
 const { protect, authorize } = require('../middleware/auth');
 const { notifyAdminNewOrder, sendOrderConfirmationToCustomer, sendWhatsAppNotification } = require('../utils/mailer');
 
+// GET order stats (full DB counts — not page-limited)
+router.get('/stats/summary', protect, async (req, res) => {
+  try {
+    const [total, pending, processing, shipped, delivered, cancelled, revenueAgg] = await Promise.all([
+      Order.countDocuments({}),
+      Order.countDocuments({ status: 'pending' }),
+      Order.countDocuments({ status: 'processing' }),
+      Order.countDocuments({ status: 'shipped' }),
+      Order.countDocuments({ status: 'delivered' }),
+      Order.countDocuments({ status: 'cancelled' }),
+      Order.aggregate([{ $group: { _id: null, total: { $sum: '$total' }, online: { $sum: { $cond: [{ $eq: ['$source', 'online'] }, 1, 0] } }, pos: { $sum: { $cond: [{ $eq: ['$source', 'pos'] }, 1, 0] } } } }]),
+    ]);
+    const agg = revenueAgg[0] || { total: 0, online: 0, pos: 0 };
+    res.json({ total, pending, processing, shipped, delivered, cancelled, totalRevenue: agg.total, onlineOrders: agg.online, posOrders: agg.pos });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
 // GET all orders
 router.get('/', protect, async (req, res) => {
   try {
@@ -244,6 +261,21 @@ router.post('/pos', protect, async (req, res) => {
 
     res.status(201).json({ order, orderNumber: order.orderNumber });
   } catch (err) { res.status(400).json({ message: err.message }); }
+});
+
+// POST contact form message (public — no auth)
+router.post('/contact', async (req, res) => {
+  try {
+    const { name, phone, message } = req.body;
+    if (!name || !phone || !message) {
+      return res.status(400).json({ message: 'Name, phone and message are required' });
+    }
+    // Log the contact message and send WhatsApp notification
+    const waMsg = `*Contact Form - Hot Wheels Bikes*\n\nName: ${name}\nPhone: ${phone}\n\nMessage:\n${message}`;
+    const { sendWhatsAppNotification } = require('../utils/mailer');
+    sendWhatsAppNotification(waMsg).catch(() => { });
+    res.json({ success: true, message: 'Message received. We will contact you soon!' });
+  } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
 module.exports = router;

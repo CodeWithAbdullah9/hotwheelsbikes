@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Download, TrendingUp, Package, Monitor, ShoppingCart, RefreshCw } from 'lucide-react'
+import { Download, TrendingUp, Package, Monitor, ShoppingCart, RefreshCw, AlertTriangle } from 'lucide-react'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Legend

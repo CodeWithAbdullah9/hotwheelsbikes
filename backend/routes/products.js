@@ -67,6 +67,17 @@ router.get('/', protect, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
+// GET low stock products — MUST be before /:id route
+router.get('/alerts/low-stock', protect, async (req, res) => {
+  try {
+    const products = await Product.find({
+      isActive: true,
+      $expr: { $lte: ['$stock', '$lowStockAlert'] },
+    }).sort({ stock: 1 });
+    res.json(products);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
 // GET single product
 router.get('/:id', protect, async (req, res) => {
   try {
@@ -136,17 +147,6 @@ router.get('/:id/stock-logs', protect, async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(50);
     res.json(logs);
-  } catch (err) { res.status(500).json({ message: err.message }); }
-});
-
-// GET low stock products
-router.get('/alerts/low-stock', protect, async (req, res) => {
-  try {
-    const products = await Product.find({
-      isActive: true,
-      $expr: { $lte: ['$stock', '$lowStockAlert'] },
-    }).sort({ stock: 1 });
-    res.json(products);
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 

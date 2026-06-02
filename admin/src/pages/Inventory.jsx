@@ -448,7 +448,7 @@ export default function Inventory() {
 
                     <div style={{ marginTop: 12, padding: 16, background: 'var(--surface)', border: '1px dashed var(--border)', borderRadius: 12, textAlign: 'center' }}>
                       <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => inp('_imageFile', e.target.files[0])} />
-                      <button type="button" onClick={() => fileRef.current.click()} className="btn btn-ghost" style={{ width: '100', padding: '12px 20px', borderRadius: 10, border: '1px solid var(--borderMd)' }}>
+                      <button type="button" onClick={() => fileRef.current.click()} className="btn btn-ghost" style={{ width: '100%', padding: '12px 20px', borderRadius: 10, border: '1px solid var(--borderMd)' }}>
                         <Upload size={16} style={{ marginRight: 8 }} /> Upload Image
                       </button>
                       {form._imageFile && (

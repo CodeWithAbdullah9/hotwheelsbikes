@@ -125,7 +125,15 @@ export default function MyOrders() {
                     <div style={{ display: "flex", gap: 16 }}>
                       <span style={{ color: "rgba(134,239,172,0.4)", fontSize: 12 }}>
                         Payment: <span style={{ color: "#d1fae5", fontWeight: 600 }}>
-                          {order.paymentMethod === "cod" ? "Cash on Delivery" : order.paymentMethod === "card" ? "Card" : "Online Transfer"}
+                          {{
+                            cod: "Cash on Delivery",
+                            bank_transfer: "Bank Transfer",
+                            jazzcash: "JazzCash",
+                            easypaisa: "EasyPaisa",
+                            stripe: "Card (Stripe)",
+                            card: "Card",
+                            cash: "Cash",
+                          }[order.paymentMethod] || order.paymentMethod}
                         </span>
                       </span>
                       <span style={{ color: "rgba(134,239,172,0.4)", fontSize: 12 }}>

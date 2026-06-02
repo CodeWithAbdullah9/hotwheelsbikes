@@ -380,7 +380,7 @@ export default function Home() {
             gap: isMobile ? 12 : 22,
           }}>
             {featured.map((p, index) => (
-              <div key={p.id} className={`fade-up stagger-${(index % 4) + 1}`}>
+              <div key={p._id || p.id} className={`fade-up stagger-${(index % 4) + 1}`}>
                 <ProductCard product={p} />
               </div>
             ))}
