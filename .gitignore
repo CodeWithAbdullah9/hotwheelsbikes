@@ -51,6 +51,8 @@ backend/addSampleOrders.js
 backend/setupImages.js
 backend/seedWebProducts.js
 backend/addProducts45.js
+backend/test*.js
+backend/testAPI*.js
 frontend/src/pages/ShopClean.jsx
 frontend/src/pages/ShopComplete.jsx
 frontend/src/pages/ShopDebug.jsx
