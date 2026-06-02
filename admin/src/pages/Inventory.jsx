@@ -159,12 +159,12 @@ export default function Inventory() {
     <>
       <div className="fade-up">
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22 }}>
+        <div className="inv-header">
           <div>
             <h2 style={{ fontFamily: "'Rajdhani',sans-serif", fontSize: 26, fontWeight: 700, color: 'var(--text)', marginBottom: 3 }}>Inventory</h2>
             <p style={{ color: 'var(--muted)', fontSize: 13 }}>Total: <b style={{ color: 'var(--green)' }}>{total}</b> products</p>
           </div>
-          <div style={{ display: 'flex', gap: 10 }}>
+          <div className="inv-header-actions">
             <button onClick={handleExport} className="btn btn-ghost btn-sm"><Download size={14} /> Export CSV</button>
             <input ref={importRef} type="file" accept=".csv" style={{ display: 'none' }} onChange={handleImport} />
             <button onClick={() => importRef.current.click()} disabled={importing} className="btn btn-ghost btn-sm">
@@ -178,7 +178,7 @@ export default function Inventory() {
         </div>
 
         {/* Statistics Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 15, marginBottom: 25 }}>
+        <div className="stats-grid">
           <div className="card" style={{ textAlign: 'center', padding: '20px 15px' }}>
             <div style={{ fontSize: '32px', fontWeight: 'bold', color: 'var(--green)', marginBottom: '8px' }}>
               {stats.total || 0}
@@ -212,24 +212,24 @@ export default function Inventory() {
         </div>
 
         {/* Filters */}
-        <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
+        <div className="inv-filters">
           <div style={{ position: 'relative', flex: 1, minWidth: 220 }}>
             <Search size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted)' }} />
             <input value={filters.search} onChange={e => setFilters(f => ({ ...f, search: e.target.value }))} placeholder="Search name, SKU, barcode..."
               className="form-input" style={{ paddingLeft: 36 }} />
           </div>
-          <select value={filters.series} onChange={e => setFilters(f => ({ ...f, series: e.target.value }))} className="form-input" style={{ width: 160 }}>
+          <select value={filters.series} onChange={e => setFilters(f => ({ ...f, series: e.target.value }))} className="form-input inv-filter-select">
             <option value="">All Series</option>
             {SERIES.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
-          <select value={filters.stockStatus} onChange={e => setFilters(f => ({ ...f, stockStatus: e.target.value }))} className="form-input" style={{ width: 140 }}>
+          <select value={filters.stockStatus} onChange={e => setFilters(f => ({ ...f, stockStatus: e.target.value }))} className="form-input inv-filter-select-sm">
             <option value="">All Stock</option>
             <option value="in">In Stock</option>
             <option value="low">Low Stock</option>
             <option value="out">Out of Stock</option>
           </select>
-          <input type="number" value={filters.minPrice} onChange={e => setFilters(f => ({ ...f, minPrice: e.target.value }))} placeholder="Min Price" className="form-input" style={{ width: 110 }} />
-          <input type="number" value={filters.maxPrice} onChange={e => setFilters(f => ({ ...f, maxPrice: e.target.value }))} placeholder="Max Price" className="form-input" style={{ width: 110 }} />
+          <input type="number" value={filters.minPrice} onChange={e => setFilters(f => ({ ...f, minPrice: e.target.value }))} placeholder="Min Price" className="form-input inv-filter-price" />
+          <input type="number" value={filters.maxPrice} onChange={e => setFilters(f => ({ ...f, maxPrice: e.target.value }))} placeholder="Max Price" className="form-input inv-filter-price" />
         </div>
 
         {/* Table */}

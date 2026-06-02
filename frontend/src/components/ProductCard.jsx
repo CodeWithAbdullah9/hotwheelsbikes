@@ -27,7 +27,7 @@ export default function ProductCard({ product }) {
     : `/product/${product._id}`;
 
   const displayPrice = product.salePrice || product.price || 0;
-  const originalPrice = product.originalPrice || product.price || 0;
+  const originalPrice = product.price || 0;
   const hasDiscount = displayPrice > 0 && originalPrice > 0 && displayPrice < originalPrice;
   const discountPercent = hasDiscount
     ? Math.round(((originalPrice - displayPrice) / originalPrice) * 100)

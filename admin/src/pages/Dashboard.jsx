@@ -39,7 +39,7 @@ export default function Dashboard() {
       <h2 style={{ fontFamily: "'Rajdhani',sans-serif", fontSize: 26, fontWeight: 700, color: 'var(--text)', marginBottom: 22 }}>Dashboard</h2>
 
       {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 16, marginBottom: 28 }}>
+      <div className="stats-grid" style={{ marginBottom: 28 }}>
         {stats.map(({ label, value, icon: Icon, color, sub }) => (
           <div key={label} className="card">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
@@ -54,7 +54,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
+      <div className="dash-charts-grid">
         {/* Revenue Chart */}
         <div className="card">
           <h3 style={{ color: 'var(--text)', fontSize: 15, fontWeight: 700, marginBottom: 18 }}>Revenue — Last 7 Days</h3>
@@ -93,7 +93,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+      <div className="dash-charts-grid">
         {/* Recent Orders */}
         <div className="card">
           <h3 style={{ color: 'var(--text)', fontSize: 15, fontWeight: 700, marginBottom: 18 }}>Recent Orders</h3>

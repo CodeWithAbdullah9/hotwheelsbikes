@@ -21,13 +21,13 @@ const T = {
   borderMid: "rgba(74,222,128,0.25)",
 };
 
-/* Per-category hero config */
+/* Per-category hero config — badge is now dynamic, set at render time */
 const categoryHero = {
-  "all": { img: "https://hotwheelsbikes.com/wp-content/uploads/2024/10/c634106062727b64f1aa761126e57295.jpg_720x720q80.jpg", label: "Browse Our Collection", desc: "Pakistan's largest selection — Hot Wheels, Bicycles, Accessories, and Parts.", badge: "45+ Products" },
-  "Hot Wheels": { img: "https://hotwheelsbikes.com/wp-content/uploads/2024/10/cb3fd2cd4691c58e130c512e1008c623.jpg_720x720q80.jpg_.webp", label: "Hot Wheels Collection", desc: "Premium die-cast cars and collectibles. Classic and modern designs.", badge: "15 Models" },
-  "Bicycles": { img: "https://hotwheelsbikes.com/wp-content/uploads/2024/10/unnamed.png", label: "All Bicycles", desc: "Mountain, road, electric, and kids bikes. Perfect for every rider and terrain.", badge: "10 Bikes" },
-  "Accessories": { img: "https://hotwheelsbikes.com/wp-content/uploads/2024/10/c634106062727b64f1aa761126e57295.jpg_720x720q80.jpg", label: "Cycling Accessories", desc: "Helmets, gloves, shoes, and more. Everything you need for the perfect ride.", badge: "10 Items" },
-  "Parts": { img: "https://hotwheelsbikes.com/wp-content/uploads/2024/10/cb3fd2cd4691c58e130c512e1008c623.jpg_720x720q80.jpg_.webp", label: "Bike Parts", desc: "Genuine parts and components for all bike types. Keep your ride running perfectly.", badge: "10 Parts" },
+  "all": { img: "https://hotwheelsbikes.com/wp-content/uploads/2024/10/c634106062727b64f1aa761126e57295.jpg_720x720q80.jpg", label: "Browse Our Collection", desc: "Pakistan's largest selection — Hot Wheels, Bicycles, Accessories, and Parts." },
+  "Hot Wheels": { img: "https://hotwheelsbikes.com/wp-content/uploads/2024/10/cb3fd2cd4691c58e130c512e1008c623.jpg_720x720q80.jpg_.webp", label: "Hot Wheels Collection", desc: "Premium die-cast cars and collectibles. Classic and modern designs." },
+  "Bicycles": { img: "https://hotwheelsbikes.com/wp-content/uploads/2024/10/unnamed.png", label: "All Bicycles", desc: "Mountain, road, electric, and kids bikes. Perfect for every rider and terrain." },
+  "Accessories": { img: "https://hotwheelsbikes.com/wp-content/uploads/2024/10/c634106062727b64f1aa761126e57295.jpg_720x720q80.jpg", label: "Cycling Accessories", desc: "Helmets, gloves, shoes, and more. Everything you need for the perfect ride." },
+  "Parts": { img: "https://hotwheelsbikes.com/wp-content/uploads/2024/10/cb3fd2cd4691c58e130c512e1008c623.jpg_720x720q80.jpg_.webp", label: "Bike Parts", desc: "Genuine parts and components for all bike types. Keep your ride running perfectly." },
 };
 
 export default function Shop({ defaultCategory }) {
@@ -120,7 +120,11 @@ export default function Shop({ defaultCategory }) {
       case "price-asc": r.sort((a, b) => (a.salePrice || a.price) - (b.salePrice || b.price)); break;
       case "price-desc": r.sort((a, b) => (b.salePrice || b.price) - (a.salePrice || a.price)); break;
       case "name-asc": r.sort((a, b) => a.name.localeCompare(b.name)); break;
-      case "discount": r.sort((a, b) => (b.originalPrice - b.salePrice) / b.originalPrice - (a.originalPrice - a.salePrice) / a.originalPrice); break;
+      case "discount": r.sort((a, b) => {
+        const discA = a.price > 0 ? (a.price - (a.salePrice || a.price)) / a.price : 0;
+        const discB = b.price > 0 ? (b.price - (b.salePrice || b.price)) / b.price : 0;
+        return discB - discA;
+      }); break;
     }
     return r;
   }, [products, activeCategory, searchQuery, priceRange, sortBy]);
@@ -132,7 +136,13 @@ export default function Shop({ defaultCategory }) {
     ? "All Products"
     : activeCategory;
 
-  const hero = categoryHero[activeCategory] || categoryHero["all"];
+  const heroBase = categoryHero[activeCategory] || categoryHero["all"];
+  // Dynamic badge: show real product count from DB
+  const heroBadgeCount = activeCategory === "all" ? products.length : products.filter(p => p.category === activeCategory).length;
+  const hero = {
+    ...heroBase,
+    badge: loading ? "Loading..." : `${heroBadgeCount} Product${heroBadgeCount !== 1 ? "s" : ""}`,
+  };
 
   const inputStyle = {
     width: "100%", padding: "10px 12px",

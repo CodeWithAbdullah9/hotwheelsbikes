@@ -392,6 +392,58 @@ textarea.form-input {
    ADMIN PANEL — MOBILE RESPONSIVE
 ══════════════════════════════════════════ */
 
+/* Stats grid — use a proper class */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+/* Dashboard charts grid */
+.dash-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+/* Inventory header */
+.inv-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.inv-header-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Inventory filters */
+.inv-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.inv-filter-select {
+  width: 160px;
+}
+
+.inv-filter-select-sm {
+  width: 140px;
+}
+
+.inv-filter-price {
+  width: 110px;
+}
+
 /* Tablet */
 @media (max-width: 1024px) {
   .pos-grid {
@@ -402,22 +454,20 @@ textarea.form-input {
   .pos-cart {
     max-height: 400px;
   }
+
+  /* Dashboard charts — stack on tablet */
+  .dash-charts-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 /* Mobile */
 @media (max-width: 768px) {
 
-  /* Sidebar — hidden by default on mobile, shown as overlay */
-  aside[style*="position:fixed"],
-  aside[style*="position: fixed"] {
-    transform: translateX(-100%);
-    transition: transform 0.25s ease;
-    z-index: 300;
-  }
-
-  /* Main content — full width on mobile */
-  div[style*="marginLeft: open"] {
-    margin-left: 0 !important;
+  /* Stats grid — 2 col on mobile */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
   }
 
   /* Cards — reduce padding */
@@ -450,7 +500,6 @@ textarea.form-input {
   /* Form inputs — larger touch targets */
   .form-input {
     padding: 13px 14px !important;
-    font-size: 16px !important;
   }
 
   /* Buttons — full width in forms */
@@ -463,29 +512,37 @@ textarea.form-input {
     justify-content: center !important;
   }
 
-  /* Stats grid — 2 col */
-  div[style*="gridTemplateColumns: 'repeat(auto-fit"] {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-
   /* Dashboard charts — full width */
-  div[style*="gridTemplateColumns: '1fr 1fr'"] {
+  .dash-charts-grid {
     grid-template-columns: 1fr !important;
+    gap: 16px !important;
   }
 
-  /* Filters — wrap */
-  div[style*="display:'flex', gap:10, marginBottom:20, flexWrap:'wrap'"] {
+  /* Inventory header — stack on mobile */
+  .inv-header {
     flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  .inv-header-actions {
+    width: 100% !important;
+    justify-content: flex-start !important;
+  }
+
+  /* Inventory filters — full width */
+  .inv-filters {
+    flex-direction: column !important;
+  }
+
+  .inv-filter-select,
+  .inv-filter-select-sm,
+  .inv-filter-price {
+    width: 100% !important;
   }
 
   /* POS grid — stack */
   .pos-grid {
     grid-template-columns: 1fr !important;
-  }
-
-  /* Header height */
-  header[style*="height:60"] {
-    height: 56px !important;
   }
 
   /* Pagination */
@@ -499,8 +556,14 @@ textarea.form-input {
 @media (max-width: 480px) {
 
   /* Stats — 1 col */
-  div[style*="gridTemplateColumns: 'repeat(auto-fit"] {
+  .stats-grid {
     grid-template-columns: 1fr !important;
+  }
+
+  /* Inventory header buttons — smaller text */
+  .inv-header-actions .btn-sm {
+    padding: 6px 8px !important;
+    font-size: 11px !important;
   }
 
   /* Buttons sm */
@@ -523,11 +586,6 @@ textarea.form-input {
   th {
     font-size: 10px !important;
     padding: 8px 10px !important;
-  }
-
-  /* Login card */
-  div[style*="maxWidth: 420"] {
-    padding: 24px 20px !important;
   }
 }
 
